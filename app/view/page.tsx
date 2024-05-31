@@ -1,18 +1,22 @@
 import Paper from "@mui/material/Paper";
 import Masonry from "@mui/lab/Masonry";
 import { mock } from "@/public/mock";
-import AddPaper from "@/components/papers/AddPaper";
+import LinkPaper from "@/components/LinkPaper";
 
+//May 30 memo
+//children: Arrayでcomponentsに整形する。(getProgramAccouns時)
 export default function Page() {
   return (
-    <Masonry columns={5} spacing={1}>
-      <AddPaper>Mint!</AddPaper>
+    <div>
+      <Masonry columns={5} spacing={1}>
+        <LinkPaper content="Mint!" link="/mint" />
 
-      {mock.map((image, index) => (
-        <Paper key={index} className="">
-          <img src={image} alt="image" />
-        </Paper>
-      ))}
-    </Masonry>
+        {mock.map((image, index) => (
+          <Paper key={index} className="">
+            <img src={image} alt="image" />
+          </Paper>
+        ))}
+      </Masonry>
+    </div>
   );
 }
