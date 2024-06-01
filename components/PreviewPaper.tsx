@@ -2,8 +2,8 @@ import React from "react";
 import { UseFormRegister, UseFormWatch } from "react-hook-form";
 import Paper from "@mui/material/Paper";
 import { Typography } from "@material-tailwind/react";
-import useVanillaTilt from "@/hooks/useVanillaTilt";
-import useImagePreview from "@/hooks/useImagePreview";
+import { useVanillaTilt } from "@/hooks/useVanillaTilt";
+import { useImagePreview } from "@/hooks/useImagePreview";
 
 interface PreviewPaperProps {
   register: UseFormRegister<any>;

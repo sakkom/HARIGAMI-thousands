@@ -3,8 +3,8 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button, Input, Typography } from "@material-tailwind/react";
-import { Center } from "@/style/Style";
-import { PreviewPaper } from "../PreviewPaper";
+import { Center } from "@/components/layouts/Style";
+import { PreviewPaper } from "@/components/PreviewPaper";
 
 type Inputs = {
   image: FileList | null;
@@ -13,7 +13,7 @@ type Inputs = {
   quantity: number;
 };
 
-const MintForm: React.FC = () => {
+export const MintForm: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -26,8 +26,8 @@ const MintForm: React.FC = () => {
   };
 
   return (
-    <Center>
-      <div className="w-1/3 h-max">
+    <Center className="items-center min-h-screen-minus-48">
+      <div className="w-1/3">
         <form onSubmit={handleSubmit(onSubmit)}>
           <PreviewPaper register={register} watch={watch} />
 
@@ -83,5 +83,3 @@ const MintForm: React.FC = () => {
     </Center>
   );
 };
-
-export default MintForm;

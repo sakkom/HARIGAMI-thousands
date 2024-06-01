@@ -1,7 +1,7 @@
 import Paper from "@mui/material/Paper";
 import Masonry from "@mui/lab/Masonry";
 import { mock } from "@/public/mock";
-import LinkPaper from "@/components/LinkPaper";
+import { LinkPaper } from "@/components/LinkPaper";
 
 //May 30 memo
 //children: Arrayでcomponentsに整形する。(getProgramAccouns時)

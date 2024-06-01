@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { UseFormWatch } from "react-hook-form";
 
-const useImagePreview = (watch: UseFormWatch<any>) => {
+export const useImagePreview = (watch: UseFormWatch<any>) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const imageRef = watch("image");
 
@@ -20,5 +20,3 @@ const useImagePreview = (watch: UseFormWatch<any>) => {
 
   return imageUrl;
 };
-
-export default useImagePreview;

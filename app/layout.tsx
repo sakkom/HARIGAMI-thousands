@@ -1,6 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, NextPage } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Wallet } from "@/context/Wallet";
+import { AppBar } from "@/components/layouts/AppBar";
+import { BottomBar } from "@/components/layouts/BottomBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +19,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <Wallet>
+          <AppBar />
+          {children}
+          {/* <BottomBar /> */}
+        </Wallet>
+      </body>
     </html>
   );
 }

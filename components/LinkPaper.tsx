@@ -4,14 +4,17 @@ import React from "react";
 import Paper from "@mui/material/Paper";
 import Link from "next/link";
 import { Typography } from "@material-tailwind/react";
-import useVanillaTilt from "@/hooks/useVanillaTilt";
+import { useVanillaTilt } from "@/hooks/useVanillaTilt";
 
 interface LinkPaperProps {
   content?: string;
   link?: string;
 }
 
-const LinkPaper: React.FC<LinkPaperProps> = ({ content, link = "#" }) => {
+export const LinkPaper: React.FC<LinkPaperProps> = ({
+  content,
+  link = "#",
+}) => {
   const paperRef = useVanillaTilt();
 
   return (
@@ -29,5 +32,3 @@ const LinkPaper: React.FC<LinkPaperProps> = ({ content, link = "#" }) => {
     </div>
   );
 };
-
-export default LinkPaper;

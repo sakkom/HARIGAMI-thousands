@@ -1,4 +1,4 @@
-import MintForm from "@/components/pages/MintForm";
+import { MintForm } from "@/pages/MintForm";
 
 export default function Page() {
   return <MintForm />;
