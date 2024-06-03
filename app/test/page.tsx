@@ -1,11 +1,11 @@
 "use client";
 
-import { AppBar } from "@/components/layouts/AppBar";
+import { CandyMachine } from "@/transactions/CandyMachine";
 
 export default function Page() {
   return (
     <div>
-      <AppBar />
+      <CandyMachine />
     </div>
   );
 }
