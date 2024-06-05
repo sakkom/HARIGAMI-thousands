@@ -17,7 +17,6 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@material-tailwind/react": "^2.1.9",
-    "@metaplex-foundation/mpl-core": "^1.0.0",
     "@metaplex-foundation/mpl-core-candy-machine": "^0.2.1",
     "@metaplex-foundation/umi": "^0.9.1",
     "@metaplex-foundation/umi-bundle-defaults": "^0.9.1",
