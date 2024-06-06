@@ -12,7 +12,7 @@ export const AppBar: FC = () => {
         <HomeIcon fontSize="large" />
         <PersonIcon fontSize="large" />
       </div>
-      <WalletMultiButton />
+      <WalletMultiButton style={{}} />
     </div>
   );
 };

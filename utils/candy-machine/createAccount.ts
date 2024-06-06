@@ -1,4 +1,6 @@
 import { mockStorage } from "@metaplex-foundation/umi-storage-mock";
+import { WalletContextState } from "@solana/wallet-adapter-react";
+import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
 import {
   createGenericFileFromBrowserFile,
   createGenericFileFromJson,
@@ -8,20 +10,17 @@ import {
   some,
   sol,
   TransactionBuilderSendAndConfirmOptions,
-  PublicKey,
+  publicKey,
+  transactionBuilder,
 } from "@metaplex-foundation/umi";
-import { WalletContextState } from "@solana/wallet-adapter-react";
-import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
+import { mplCore, createCollectionV1 } from "@metaplex-foundation/mpl-core";
 import {
-  mplCore,
-  createCollectionV1,
-  fetchCollectionV1,
-  CollectionV1,
-} from "@metaplex-foundation/mpl-core";
-import {
+  addConfigLines,
   create,
   mplCandyMachine as mplCoreCandyMachine,
+  mintV1,
 } from "@metaplex-foundation/mpl-core-candy-machine";
+import { setComputeUnitLimit } from "@metaplex-foundation/mpl-toolbox";
 import { base58 } from "@metaplex-foundation/umi/serializers";
 
 interface Attributes {
@@ -50,6 +49,10 @@ interface MetaData {
   properties?: Properties;
 }
 
+// interface ExpectedCandyMachineState {
+// }
+
+//change for a production environment.
 const options: TransactionBuilderSendAndConfirmOptions = {
   send: { skipPreflight: true },
   confirm: { commitment: "processed" },
@@ -91,9 +94,6 @@ export const createCoreCollection = async (
   wallet: WalletContextState,
   uri: string,
 ): Promise<KeypairSigner> => {
-  // if (!wallet.connected) throw new Error("wallet is not connected");
-  console.log("collectionを作成します");
-
   umi.use(walletAdapterIdentity(wallet)).use(mplCore());
 
   const collectionSigner = generateSigner(umi);
@@ -104,10 +104,8 @@ export const createCoreCollection = async (
     uri: uri,
   }).sendAndConfirm(umi);
 
-  const result = await fetchCollectionAsset(umi, collectionSigner.publicKey);
-  console.log(`collection asset: ${result}`);
-  // const tx = base58.deserialize(signature)[0];
-  // console.log(tx);
+  const tx = base58.deserialize(signature)[0];
+  console.log(`Create Collection! tx: ${tx}`);
 
   return collectionSigner;
 };
@@ -115,19 +113,18 @@ export const createCoreCollection = async (
 export const createCandyMachine = async (
   umi: Umi,
   wallet: WalletContextState,
-  collectionSigner: KeypairSigner,
+  collectionSigner: KeypairSigner | null,
 ): Promise<KeypairSigner> => {
   umi.use(walletAdapterIdentity(wallet)).use(mplCoreCandyMachine());
+  if (!collectionSigner) throw Error("collection is null");
 
-  console.log("machine作成にとりかかります");
-
-  const candyMachine = generateSigner(umi);
+  const candyMachineSigner = generateSigner(umi);
 
   const createIx = await create(umi, {
-    candyMachine,
+    candyMachine: candyMachineSigner,
     collection: collectionSigner.publicKey,
     collectionUpdateAuthority: umi.identity,
-    itemsAvailable: 1000,
+    itemsAvailable: 10,
     authority: umi.identity.publicKey,
     isMutable: true,
     configLineSettings: some({
@@ -139,22 +136,81 @@ export const createCandyMachine = async (
     }),
     guards: {
       botTax: some({ lamports: sol(0.001), lastInstruction: true }),
-      // All other guards are disabled...
     },
   });
 
   const { signature } = await createIx.sendAndConfirm(umi, options);
-  // const tx = base58.deserialize(signature)[0];
-  // console.log(`candy machineのsignature: ${tx}`);
 
-  return candyMachine;
+  const tx = base58.deserialize(signature)[0];
+  console.log(
+    `Create Candy Machine! tx:  ${tx}\ Candy machine id: ${candyMachineSigner.publicKey}`,
+  );
+
+  return candyMachineSigner;
 };
 
-export const fetchCollectionAsset = async (
+export const addItems = async (
   umi: Umi,
-  address: PublicKey,
-): Promise<CollectionV1> => {
-  const asset = await fetchCollectionV1(umi, address);
-  // console.log(asset);
-  return asset;
+  wallet: WalletContextState,
+  candyMachine: KeypairSigner,
+): Promise<void> => {
+  try {
+    umi.use(walletAdapterIdentity(wallet)).use(mplCoreCandyMachine());
+
+    await addConfigLines(umi, {
+      candyMachine: candyMachine.publicKey,
+      index: 0,
+      configLines: [
+        { name: "1", uri: "1.json" },
+        { name: "2", uri: "1.json" },
+        { name: "3", uri: "1.json" },
+        { name: "4", uri: "1.json" },
+        { name: "5", uri: "1.json" },
+        { name: "6", uri: "1.json" },
+        { name: "7", uri: "1.json" },
+        { name: "8", uri: "1.json" },
+        { name: "9", uri: "1.json" },
+        { name: "10", uri: "1.json" },
+      ],
+    }).sendAndConfirm(umi, options);
+
+    console.log(`Added items to the Candy Machine: ${candyMachine.publicKey}`);
+  } catch (error) {
+    console.log("Error adding items to the Candy Machine");
+  }
+};
+
+export const mintFromCandyGuard = async (
+  umi: Umi,
+  wallet: WalletContextState,
+  // candyMachine: KeypairSigner,
+  // corecollection: KeypairSigner,
+): Promise<any> => {
+  umi.use(walletAdapterIdentity(wallet)).use(mplCoreCandyMachine());
+
+  const assetSigner = generateSigner(umi);
+
+  const coreCollectionId = publicKey(
+    "F7xyrbKksrfTjPtv9owxLoF8LgucPTk8kwn8asirbBq6",
+  );
+  const candyMachineId = publicKey(
+    "FYaJC42ArAj5ivCj9beneFSqG3n9mgGrrpt5g8Yf7Fzw",
+  );
+
+  const { signature } = await transactionBuilder()
+    .add(setComputeUnitLimit(umi, { units: 800_000 }))
+    .add(
+      mintV1(umi, {
+        candyMachine: candyMachineId,
+        asset: assetSigner,
+        collection: coreCollectionId,
+      }),
+    )
+    .sendAndConfirm(umi, options);
+
+  console.log(
+    `OK! signature: ${base58.deserialize(signature)[0]}\ Asset Id: ${assetSigner.publicKey}`,
+  );
+
+  return assetSigner;
 };

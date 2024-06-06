@@ -11,7 +11,15 @@ import {
   getImageUri,
   getMetaDataUri,
   createCandyMachine,
-} from "@/utils/umiUtils";
+  addItems,
+  mintFromCandyGuard,
+} from "@/utils/candy-machine/createAccount";
+import {
+  fetchAssetDetail,
+  fetchCandyMachineDetail,
+  fetchCollectionDetail,
+} from "@/utils/candy-machine/fetchAccount";
+
 import { createMetaData } from "@/utils/formatUtils";
 import { useBalance } from "@/hooks/useBalance";
 
@@ -31,25 +39,42 @@ export const CandyMachine = () => {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     if (data.image?.length) {
       const fileList = data.image;
+
       const imageUri = await getImageUri(umi, fileList);
-      // console.log(imageUri);
+      console.log(`Step1 Upload Image: ${imageUri}`);
+
       const metaData = createMetaData(imageUri);
-      // console.log(metaData);
+      console.log(`Step2 Setup Metadata`);
+
       const metaDataUri = await getMetaDataUri(umi, metaData);
-      // console.log(`metaDataUri: ${metaDataUri}`);
+      console.log(`Step3 Upload MetaData: ${metaDataUri}`);
 
       const collectionSigner = await createCoreCollection(
         umi,
         wallet,
         metaDataUri,
       );
+      console.log(`Step4 Create Collection\ Id: ${collectionSigner.publicKey}`);
 
       const candyMachineSigner = await createCandyMachine(
         umi,
         wallet,
         collectionSigner,
       );
-      console.log(candyMachineSigner);
+      console.log(
+        `Step5 Create Candy Machine\ Id: ${candyMachineSigner.publicKey}`,
+      );
+
+      await addItems(umi, wallet, candyMachineSigner);
+      console.log(`Step6 Create Items`);
+
+      console.log(
+        `
+        Important Account \
+        Core Collection: ${collectionSigner?.publicKey} \
+        Candy Machine: ${candyMachineSigner.publicKey}
+      `,
+      );
     }
   };
 
