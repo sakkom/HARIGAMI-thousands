@@ -1,9 +1,5 @@
-import { mockStorage } from "@metaplex-foundation/umi-storage-mock";
-import { WalletContextState } from "@solana/wallet-adapter-react";
-import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
+// import { mockStorage } from "@metaplex-foundation/umi-storage-mock";
 import {
-  createGenericFileFromBrowserFile,
-  createGenericFileFromJson,
   generateSigner,
   KeypairSigner,
   Umi,
@@ -12,45 +8,17 @@ import {
   TransactionBuilderSendAndConfirmOptions,
   publicKey,
   transactionBuilder,
+  none,
 } from "@metaplex-foundation/umi";
 import { mplCore, createCollectionV1 } from "@metaplex-foundation/mpl-core";
 import {
-  addConfigLines,
   create,
   mplCandyMachine as mplCoreCandyMachine,
   mintV1,
 } from "@metaplex-foundation/mpl-core-candy-machine";
 import { setComputeUnitLimit } from "@metaplex-foundation/mpl-toolbox";
 import { base58 } from "@metaplex-foundation/umi/serializers";
-
-interface Attributes {
-  trait_type?: string;
-  value?: string;
-}
-
-interface Properties {
-  files?: AttachedFile[];
-  category: string;
-}
-
-interface AttachedFile {
-  uri?: string;
-  type?: string;
-  cdn?: boolean;
-}
-
-interface MetaData {
-  name: string;
-  description: string;
-  image: string;
-  animation_uri?: string;
-  external_uri?: string;
-  attributes: Attributes[];
-  properties?: Properties;
-}
-
-// interface ExpectedCandyMachineState {
-// }
+import { useUmiIdentity } from "@/hooks/useUmi";
 
 //change for a production environment.
 const options: TransactionBuilderSendAndConfirmOptions = {
@@ -58,79 +26,48 @@ const options: TransactionBuilderSendAndConfirmOptions = {
   confirm: { commitment: "processed" },
 };
 
-export const getImageUri = async (
-  umi: any,
-  fileList: FileList,
-): Promise<string> => {
-  umi.use(mockStorage());
-
-  const file: File = fileList[0];
-  if (!file) throw new Error("No file provided");
-
-  const genericFile = await createGenericFileFromBrowserFile(file);
-  // console.log(genericFile);
-  const uriArray = await umi.uploader.upload([genericFile]);
-  const uri = uriArray[0];
-
-  return uri;
-};
-
-export const getMetaDataUri = async (
-  umi: any,
-  metaData: MetaData,
-): Promise<string> => {
-  umi.use(mockStorage());
-
-  const jsonMetadata = JSON.stringify(metaData);
-  const genericMetaData = createGenericFileFromJson(jsonMetadata);
-  const uriArray = await umi.uploader.upload([genericMetaData]);
-  const uri = uriArray[0];
-
-  return uri;
-};
-
 export const createCoreCollection = async (
-  umi: Umi,
-  wallet: WalletContextState,
+  umiIdentity: Umi,
   uri: string,
 ): Promise<KeypairSigner> => {
-  umi.use(walletAdapterIdentity(wallet)).use(mplCore());
+  umiIdentity.use(mplCore());
 
-  const collectionSigner = generateSigner(umi);
+  const collectionSigner = generateSigner(umiIdentity);
 
-  const { signature } = await createCollectionV1(umi, {
+  // const name = metaData.name;
+  const { signature } = await createCollectionV1(umiIdentity, {
     collection: collectionSigner,
-    name: "A Collection",
+    name: "Collectionnnnn",
     uri: uri,
-  }).sendAndConfirm(umi);
+  }).sendAndConfirm(umiIdentity);
 
-  const tx = base58.deserialize(signature)[0];
-  console.log(`Create Collection! tx: ${tx}`);
+  console.log(`Create Collection! tx: ${base58.deserialize(signature)[0]}`);
 
   return collectionSigner;
 };
 
 export const createCandyMachine = async (
-  umi: Umi,
-  wallet: WalletContextState,
-  collectionSigner: KeypairSigner | null,
+  umiIdentity: Umi,
+  collectionSigner: KeypairSigner,
+  uri: string,
 ): Promise<KeypairSigner> => {
-  umi.use(walletAdapterIdentity(wallet)).use(mplCoreCandyMachine());
-  if (!collectionSigner) throw Error("collection is null");
+  umiIdentity.use(mplCoreCandyMachine());
+  // if (!collectionSigner) throw Error("collection is null");
 
-  const candyMachineSigner = generateSigner(umi);
+  const candyMachineSigner = generateSigner(umiIdentity);
 
-  const createIx = await create(umi, {
+  //リファクタリング
+  const createIx = await create(umiIdentity, {
     candyMachine: candyMachineSigner,
     collection: collectionSigner.publicKey,
-    collectionUpdateAuthority: umi.identity,
+    collectionUpdateAuthority: umiIdentity.identity,
     itemsAvailable: 10,
-    authority: umi.identity.publicKey,
+    authority: umiIdentity.identity.publicKey,
     isMutable: true,
     configLineSettings: some({
       prefixName: "Quick NFT #",
       nameLength: 11,
-      prefixUri: "https://example.com/metadata/",
+      prefixUri: uri,
       uriLength: 29,
       isSequential: false,
     }),
@@ -139,7 +76,7 @@ export const createCandyMachine = async (
     },
   });
 
-  const { signature } = await createIx.sendAndConfirm(umi, options);
+  const { signature } = await createIx.sendAndConfirm(umiIdentity, options);
 
   const tx = base58.deserialize(signature)[0];
   console.log(
@@ -149,64 +86,32 @@ export const createCandyMachine = async (
   return candyMachineSigner;
 };
 
-export const addItems = async (
-  umi: Umi,
-  wallet: WalletContextState,
-  candyMachine: KeypairSigner,
-): Promise<void> => {
-  try {
-    umi.use(walletAdapterIdentity(wallet)).use(mplCoreCandyMachine());
-
-    await addConfigLines(umi, {
-      candyMachine: candyMachine.publicKey,
-      index: 0,
-      configLines: [
-        { name: "1", uri: "1.json" },
-        { name: "2", uri: "1.json" },
-        { name: "3", uri: "1.json" },
-        { name: "4", uri: "1.json" },
-        { name: "5", uri: "1.json" },
-        { name: "6", uri: "1.json" },
-        { name: "7", uri: "1.json" },
-        { name: "8", uri: "1.json" },
-        { name: "9", uri: "1.json" },
-        { name: "10", uri: "1.json" },
-      ],
-    }).sendAndConfirm(umi, options);
-
-    console.log(`Added items to the Candy Machine: ${candyMachine.publicKey}`);
-  } catch (error) {
-    console.log("Error adding items to the Candy Machine");
-  }
-};
-
 export const mintFromCandyGuard = async (
-  umi: Umi,
-  wallet: WalletContextState,
+  umiIdentity: Umi,
   // candyMachine: KeypairSigner,
   // corecollection: KeypairSigner,
 ): Promise<any> => {
-  umi.use(walletAdapterIdentity(wallet)).use(mplCoreCandyMachine());
+  umiIdentity.use(mplCoreCandyMachine());
 
-  const assetSigner = generateSigner(umi);
+  const assetSigner = generateSigner(umiIdentity);
 
   const coreCollectionId = publicKey(
-    "F7xyrbKksrfTjPtv9owxLoF8LgucPTk8kwn8asirbBq6",
+    "5JRSELVfA4UegKVtjQGv9u9CvrJXKzo6qMkq2ukbmP7v",
   );
   const candyMachineId = publicKey(
-    "FYaJC42ArAj5ivCj9beneFSqG3n9mgGrrpt5g8Yf7Fzw",
+    "9p9ApGfQgRbQ9ooRZsRr6C2Gd5aLffeQ9Gc5d9TwmNhH",
   );
 
   const { signature } = await transactionBuilder()
-    .add(setComputeUnitLimit(umi, { units: 800_000 }))
+    .add(setComputeUnitLimit(umiIdentity, { units: 800_000 }))
     .add(
-      mintV1(umi, {
+      mintV1(umiIdentity, {
         candyMachine: candyMachineId,
         asset: assetSigner,
         collection: coreCollectionId,
       }),
     )
-    .sendAndConfirm(umi, options);
+    .sendAndConfirm(umiIdentity, options);
 
   console.log(
     `OK! signature: ${base58.deserialize(signature)[0]}\ Asset Id: ${assetSigner.publicKey}`,

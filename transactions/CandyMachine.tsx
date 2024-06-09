@@ -1,26 +1,16 @@
-//0604 mockStorage -> arwearve
-//0604 generic型からuriを作成する同じ関数をリファクタリング
-// import { irysUploader } from "@metaplex-foundation/umi-uploader-irys";
+import { useState } from "react";
 import { PreviewPaper } from "@/components/PreviewPaper";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Button } from "@material-tailwind/react";
+import { Button, Typography } from "@material-tailwind/react";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
-import { useUmi } from "@/hooks/useUmi";
+import { useUmiRpc, useUmiIdentity } from "@/hooks/useUmi";
 import {
   createCoreCollection,
-  getImageUri,
-  getMetaDataUri,
   createCandyMachine,
-  addItems,
   mintFromCandyGuard,
 } from "@/utils/candy-machine/createAccount";
-import {
-  fetchAssetDetail,
-  fetchCandyMachineDetail,
-  fetchCollectionDetail,
-} from "@/utils/candy-machine/fetchAccount";
-
-import { createMetaData } from "@/utils/formatUtils";
+import { getMetaDataUri } from "@/utils/formatUtils";
+import { addItems } from "@/utils/candy-machine/updateAccount";
 import { useBalance } from "@/hooks/useBalance";
 
 type Inputs = {
@@ -32,50 +22,52 @@ export const CandyMachine = () => {
   const { connection } = useConnection();
   const wallet = useWallet();
   const publicKey = wallet.publicKey;
-  const umi = useUmi();
-
+  const umiRpc = useUmiRpc();
+  const umiIdentity = useUmiIdentity(wallet);
   const balance = useBalance(publicKey, connection);
+
+  // const [assetStatus, setAssetStatus] = useState<any>(null);
+  // const [collectionStatus, setCollectionStatus] = useState<any>(null);
+  // const [candyMachineStatus, setCandyMachineStatus] = useState<any>(null);
+  // const [image, setImage] = useState<any>(null);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     if (data.image?.length) {
       const fileList = data.image;
 
-      const imageUri = await getImageUri(umi, fileList);
-      console.log(`Step1 Upload Image: ${imageUri}`);
-
-      const metaData = createMetaData(imageUri);
-      console.log(`Step2 Setup Metadata`);
-
-      const metaDataUri = await getMetaDataUri(umi, metaData);
-      console.log(`Step3 Upload MetaData: ${metaDataUri}`);
+      const metaDataUri = await getMetaDataUri(umiIdentity, fileList);
+      console.log(`Step1 Upload MetaData: ${metaDataUri}`);
 
       const collectionSigner = await createCoreCollection(
-        umi,
-        wallet,
+        umiIdentity,
         metaDataUri,
       );
-      console.log(`Step4 Create Collection\ Id: ${collectionSigner.publicKey}`);
+      console.log(`Step2 Create Collection\ Id: ${collectionSigner.publicKey}`);
 
       const candyMachineSigner = await createCandyMachine(
-        umi,
-        wallet,
+        umiIdentity,
         collectionSigner,
+        metaDataUri,
       );
       console.log(
-        `Step5 Create Candy Machine\ Id: ${candyMachineSigner.publicKey}`,
+        `Step3 Create Candy Machine\ Id: ${candyMachineSigner.publicKey}`,
       );
 
-      await addItems(umi, wallet, candyMachineSigner);
-      console.log(`Step6 Create Items`);
+      const quantity = await addItems(umiIdentity, candyMachineSigner);
+      console.log(`Step4 Supply Items ${quantity}`);
 
       console.log(
         `
-        Important Account \
-        Core Collection: ${collectionSigner?.publicKey} \
-        Candy Machine: ${candyMachineSigner.publicKey}
-      `,
+          Important Account \
+          Core Collection: ${collectionSigner?.publicKey} \
+          Candy Machine: ${candyMachineSigner.publicKey}
+        `,
       );
     }
+  };
+
+  const checkMint = async () => {
+    await mintFromCandyGuard(umiIdentity);
   };
 
   return (
@@ -88,6 +80,7 @@ export const CandyMachine = () => {
             <PreviewPaper register={register} watch={watch} />
             <Button type="submit">Upload</Button>
           </form>
+          <Button onClick={() => checkMint()}>Mint</Button>
         </>
       ) : (
         <h1>Wallet is not connected</h1>

@@ -12,37 +12,37 @@ import {
 } from "@metaplex-foundation/mpl-core-candy-machine";
 
 export const fetchCollectionDetail = async (
-  umi: Umi,
+  umiRpc: Umi,
   address: string,
 ): Promise<CollectionV1> => {
   const id = publicKey(address);
 
-  const result = await fetchCollectionV1(umi, id);
+  const result = await fetchCollectionV1(umiRpc, id);
   // console.log(asset);
   return result;
 };
 
 export const fetchAssetDetail = async (
-  umi: Umi,
+  umiRpc: Umi,
   address: string,
 ): Promise<AssetV1> => {
   const id = publicKey(address);
 
-  const result = await fetchAssetV1(umi, id);
+  const result = await fetchAssetV1(umiRpc, id);
   console.log({ result });
 
   return result;
 };
 
 export const fetchCandyMachineDetail = async (
-  umi: Umi,
+  umiRpc: Umi,
   address: string,
 ): Promise<CandyMachine> => {
-  umi.use(mplCoreCandyMachine());
+  umiRpc.use(mplCoreCandyMachine());
 
   const id = publicKey(address);
 
-  const result = await fetchCandyMachine(umi, id, {
+  const result = await fetchCandyMachine(umiRpc, id, {
     commitment: "confirmed",
   });
   // console.log({ });
