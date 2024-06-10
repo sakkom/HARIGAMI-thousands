@@ -8,7 +8,6 @@ import {
   TransactionBuilderSendAndConfirmOptions,
   publicKey,
   transactionBuilder,
-  none,
 } from "@metaplex-foundation/umi";
 import { mplCore, createCollectionV1 } from "@metaplex-foundation/mpl-core";
 import {
@@ -18,7 +17,6 @@ import {
 } from "@metaplex-foundation/mpl-core-candy-machine";
 import { setComputeUnitLimit } from "@metaplex-foundation/mpl-toolbox";
 import { base58 } from "@metaplex-foundation/umi/serializers";
-import { useUmiIdentity } from "@/hooks/useUmi";
 
 //change for a production environment.
 const options: TransactionBuilderSendAndConfirmOptions = {
@@ -50,6 +48,7 @@ export const createCandyMachine = async (
   umiIdentity: Umi,
   collectionSigner: KeypairSigner,
   uri: string,
+  quantity: number,
 ): Promise<KeypairSigner> => {
   umiIdentity.use(mplCoreCandyMachine());
   // if (!collectionSigner) throw Error("collection is null");
@@ -61,12 +60,12 @@ export const createCandyMachine = async (
     candyMachine: candyMachineSigner,
     collection: collectionSigner.publicKey,
     collectionUpdateAuthority: umiIdentity.identity,
-    itemsAvailable: 10,
+    itemsAvailable: quantity,
     authority: umiIdentity.identity.publicKey,
     isMutable: true,
     configLineSettings: some({
-      prefixName: "Quick NFT #",
-      nameLength: 11,
+      prefixName: "貼紙 #",
+      nameLength: 20,
       prefixUri: uri,
       uriLength: 29,
       isSequential: false,
@@ -96,10 +95,10 @@ export const mintFromCandyGuard = async (
   const assetSigner = generateSigner(umiIdentity);
 
   const coreCollectionId = publicKey(
-    "5JRSELVfA4UegKVtjQGv9u9CvrJXKzo6qMkq2ukbmP7v",
+    "B7Ls7NhPBtr5GQURNqvmpmh1v2GWdag3HdpYwdPdXRi7",
   );
   const candyMachineId = publicKey(
-    "9p9ApGfQgRbQ9ooRZsRr6C2Gd5aLffeQ9Gc5d9TwmNhH",
+    "2oVm33x4ugkhUD5SFP9ByJvU7MUxqeEEBfo8Ty1cGiqL",
   );
 
   const { signature } = await transactionBuilder()

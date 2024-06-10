@@ -1,4 +1,3 @@
-import { useUmiIdentity } from "@/hooks/useUmi";
 import {
   Umi,
   createGenericFileFromBrowserFile,
@@ -31,63 +30,29 @@ export interface MetaData {
   properties?: Properties;
 }
 
-// export const createMetaData = (imageUri: string): any => {
-//   const metaData = {
-//     name: "wwwwww",
-//     description: "description description description",
-//     image: imageUri,
-//     animation_url: "",
-//     external_url: "https://example.com",
-//     attributes: [{ trait_type: "天気", value: "晴れ" }],
-//   };
-
-//   return metaData;
-// };
-
-// export const getImageUri = async (
-//   umiIdentity: Umi,
-//   fileList: FileList,
-// ): Promise<string> => {
-//   // umi.use(mockStorage());
-//   umiIdentity.use(irysUploader());
-
-//   const file: File = fileList[0];
-//   if (!file) throw new Error("No file provided");
-
-//   const genericFile = await createGenericFileFromBrowserFile(file, {
-//     contentType: "image/jpg",
-//   }); //default: content type none
-
-//   const uriArray = await umiIdentity.uploader.upload([genericFile]);
-//   const uri = uriArray[0];
-
-//   return uri;
-// };
-
 //MESSAGE: 動的にimageURIをセットするとphantom walletになぜか反映されない。
-export const getMetaDataUri = async (
+export const getMetadataUri = async (
   umiIdentity: Umi,
-  fileList: FileList,
+  coverImage: File,
+  title: string,
+  genre?: string,
 ): Promise<any> => {
   umiIdentity.use(irysUploader());
 
-  const file: File = fileList[0];
-  if (!file) throw new Error("No file provided");
-
-  const genericFile = await createGenericFileFromBrowserFile(file); //content type
+  const genericFile = await createGenericFileFromBrowserFile(coverImage); //content type
 
   const [imageUri] = await umiIdentity.uploader.upload([genericFile]);
 
   const uri = await umiIdentity.uploader.uploadJson({
-    name: "name",
+    name: title,
     description: "Generative art on Solana.",
     image: imageUri,
     animation_url: "",
     external_url: "https://example.com",
     attributes: [
       {
-        trait_type: "trait1",
-        value: "value1",
+        trait_type: "Genre",
+        value: genre,
       },
     ],
   });

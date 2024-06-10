@@ -1,20 +1,8 @@
 import { useState, useEffect } from "react";
-import { getFirestore, collection, addDoc, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { app } from "@/firebase.config";
 
 const db = getFirestore(app);
-
-export const addData = async () => {
-  try {
-    const docRef = await addDoc(collection(db, "cmid"), {
-      pubKey: "9zV39hyCP1NWtSzB9at7B2J5LEL4vkxwPQaw2F7Qdhm6",
-    });
-
-    // console.log(docRef.id);
-  } catch (err) {
-    console.error("Error", err);
-  }
-};
 
 export const useCandyIds = (): string[] => {
   const [candyIds, setCandyIds] = useState<string[]>([]);

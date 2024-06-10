@@ -8,11 +8,13 @@ import { useImagePreview } from "@/hooks/useImagePreview";
 interface PreviewPaperProps {
   register: UseFormRegister<any>;
   watch: UseFormWatch<any>;
+  errors: any;
 }
 
 export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   register,
   watch,
+  errors,
 }) => {
   const paperRef = useVanillaTilt();
   const imageUrl = useImagePreview(watch);
@@ -26,8 +28,13 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
           <Typography variant="h1" className="text-center">
             Click to upload file
           </Typography>
-          <input type="file" {...register("image")} hidden />
+          <input type="file" {...register("coverImage")} hidden />
         </label>
+      )}
+      {errors.coverImage && (
+        <Typography color="red" variant="small">
+          {errors.coverImage.message}
+        </Typography>
       )}
     </Paper>
   );

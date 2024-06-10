@@ -2,12 +2,14 @@ import {
   Umi,
   KeypairSigner,
   TransactionBuilderSendAndConfirmOptions,
+  TransactionBuilderGroup,
+  TransactionBuilder,
 } from "@metaplex-foundation/umi";
 import {
   addConfigLines,
   mplCandyMachine as mplCoreCandyMachine,
 } from "@metaplex-foundation/mpl-core-candy-machine";
-import { publicKey } from "@metaplex-foundation/umi";
+// import { base58 } from "@metaplex-foundation/umi/serializers";
 
 const options: TransactionBuilderSendAndConfirmOptions = {
   send: { skipPreflight: true },
@@ -17,35 +19,50 @@ const options: TransactionBuilderSendAndConfirmOptions = {
 export const addItems = async (
   umiIdentity: Umi,
   candyMachine: KeypairSigner,
+  quantity: number,
 ): Promise<number | null> => {
   try {
     umiIdentity.use(mplCoreCandyMachine());
 
-    // const id = publicKey("ChF3y7V5m86nZCPho6J7ttVPUiti4ZD3vwUM2jwwUm4f");
+    const configLines = Array.from({ length: quantity }, (_, i) => ({
+      name: `${i}`,
+      uri: "",
+    }));
 
-    const configLines = [
-      { name: "1fdafa", uri: "" },
-      { name: "2gvsrfgs", uri: "" },
-      { name: "3fasadff", uri: "" },
-      { name: "1fdfa", uri: "" },
-      { name: "2dfa", uri: "" },
-      { name: "3faf", uri: "" },
-      { name: "1fdafa", uri: "" },
-      { name: "fafd2", uri: "" },
-      { name: "afd3", uri: "" },
-      { name: "ddfd1", uri: "" },
-    ];
+    const batchSize = 10;
+    let totalAdded = 0;
 
-    //roop処理したい 印刷処理
-    await addConfigLines(umiIdentity, {
-      candyMachine: candyMachine.publicKey,
-      index: 0,
-      configLines,
-    }).sendAndConfirm(umiIdentity, options);
+    const builders: TransactionBuilder[] = [];
 
-    // console.log(`Added items to the Candy Machine: ${candyMachine.publicKey}`);
+    for (let i = 0; i < configLines.length; i += batchSize) {
+      const batch = configLines.slice(i, i + batchSize);
 
-    return configLines.length;
+      const transactionBuilder = addConfigLines(umiIdentity, {
+        candyMachine: candyMachine.publicKey,
+        index: i,
+        configLines: batch,
+      });
+
+      builders.push(transactionBuilder);
+
+      totalAdded += batch.length;
+    }
+
+    const transactionBuilderGroup = new TransactionBuilderGroup(builders);
+
+    const results = await transactionBuilderGroup.sendAndConfirm(
+      umiIdentity,
+      options,
+    );
+
+    // const sigs = results.map((result) => result.signature);
+    // console.log(
+    //   sigs.map((sig) => {
+    //     return base58.deserialize(sig)[0];
+    //   }),
+    // );
+
+    return totalAdded;
   } catch (error) {
     console.log("Error adding items to the Candy Machine");
     return null;

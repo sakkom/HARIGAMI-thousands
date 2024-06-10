@@ -3,7 +3,7 @@ import { UseFormWatch } from "react-hook-form";
 
 export const useImagePreview = (watch: UseFormWatch<any>) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const imageRef = watch("image");
+  const imageRef = watch("coverImage"); //note!
 
   useEffect(() => {
     if (imageRef && imageRef.length > 0) {
