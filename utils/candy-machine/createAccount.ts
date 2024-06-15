@@ -35,7 +35,7 @@ export const createCoreCollection = async (
   // const name = metaData.name;
   const { signature } = await createCollectionV1(umiIdentity, {
     collection: collectionSigner,
-    name: "Collectionnnnn",
+    name: "Collectionnnnn", //nameをuri.nameと同一にする　これがCandy Machineの名前となるから。
     uri: uri,
   }).sendAndConfirm(umiIdentity);
 

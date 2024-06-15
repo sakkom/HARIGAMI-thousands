@@ -49,3 +49,37 @@ body {
 .min-h-screen-minus-48 {
     min-height: calc(100vh - 48px);
 }
+
+.mobile-like {
+    width: 33.33333%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@keyframes backgroundAnimation {
+    0% {
+        background-color: #00ffce;
+    }
+
+    /* Solana light blue */
+    50% {
+        background-color: #9954ff;
+    }
+
+    /* Solana purple */
+    100% {
+        background-color: #00ffce;
+    }
+
+    /* Solana light blue */
+}
+
+.animatedBackground {
+    animation: backgroundAnimation 3s linear infinite;
+}
+
+.blackGlassPaper {
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: white;
+}

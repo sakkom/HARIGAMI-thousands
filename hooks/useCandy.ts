@@ -1,130 +1,118 @@
 import { useState, useEffect } from "react";
+import { publicKey } from "@metaplex-foundation/umi";
 import {
-  CandyMachine,
-  fetchCandyMachine,
-} from "@metaplex-foundation/mpl-core-candy-machine";
-import { publicKey, PublicKey } from "@metaplex-foundation/umi";
-import { useUmiRpc } from "./useUmi";
-import { CollectionV1, fetchCollectionV1 } from "@metaplex-foundation/mpl-core";
+  CollectionIdWithCandyMachineId,
+  CollectionV1WithCandyMachineId,
+  ImageWithCandyMachineId,
+} from "@/types/customTypes";
+import { Umi } from "@metaplex-foundation/umi";
+import {
+  fetchCollectionIdViaCandyId,
+  fetchCollectionV1WithCandyId,
+  fetchMetadataWithCandyMachine,
+} from "@/utils/candy-machine/fetchAccount";
+import {
+  filterCollectionIdWithCandyMachineId,
+  filterCollectionV1WithCandyMachineId,
+  filterImageWithCandyMachineId,
+} from "@/utils/filter";
 
-export const useCandyMachines = (ids: string[]): CandyMachine[] => {
-  const [machines, setMachines] = useState<CandyMachine[]>([]);
-  const umiRpc = useUmiRpc();
+//Mainly /view
+export const useCollectionIds = (
+  umi: Umi,
+  storeIds: string[],
+): CollectionIdWithCandyMachineId[] => {
+  const [collectionIds, setCollectionIds] = useState<
+    CollectionIdWithCandyMachineId[]
+  >([]);
 
   useEffect(() => {
+    if (storeIds.length === 0) return;
+
     const fetchMachines = async () => {
       try {
         const results = await Promise.all(
-          ids.map(async (id) => {
-            try {
-              const machine = await fetchCandyMachine(umiRpc, publicKey(id));
-              // console.log(machine);
-              return machine;
-            } catch (e) {
-              console.log(`Error fetching Candy Machine with id ${id}`, e);
-              return undefined;
-            }
+          storeIds.map(async (id) => {
+            return fetchCollectionIdViaCandyId(umi, publicKey(id));
           }),
         );
 
-        const filterResults = results.filter(
-          (machine): machine is CandyMachine => machine !== undefined,
-        );
+        const filteredResults = filterCollectionIdWithCandyMachineId(results);
 
-        setMachines(filterResults);
-        console.log("CandyMachine[]を取得");
+        setCollectionIds(filteredResults);
+        // console.log("CandyMachine[]を取得");
       } catch (e) {
         console.log("Error: doesn't work useCandyMachines", e);
       }
     };
 
-    if (ids.length > 0) {
-      fetchMachines();
-    }
-  }, [ids]);
+    fetchMachines();
+  }, [storeIds, umi]);
 
-  return machines;
+  return collectionIds;
 };
 
-export const useCollections = (
-  candyMachines: CandyMachine[],
-): CollectionV1[] => {
-  const umiRpc = useUmiRpc();
-  const [collection, setCollection] = useState<CollectionV1[]>([]);
-
-  const collectionIds = candyMachines.map((machine) => {
-    return machine.collectionMint;
-  });
+export const useUrisWithCandyMachine = (
+  umi: Umi,
+  collectionIds: CollectionIdWithCandyMachineId[],
+): CollectionV1WithCandyMachineId[] => {
+  const [collectionUris, setCollectionUris] = useState<
+    CollectionV1WithCandyMachineId[]
+  >([]);
 
   useEffect(() => {
+    if (collectionIds.length === 0) return;
+
     const fetchCollections = async () => {
       try {
         const results = await Promise.all(
-          collectionIds.map(async (id) => {
-            try {
-              const collection = await fetchCollectionV1(umiRpc, publicKey(id));
-              // console.log(collection);
-              return collection;
-            } catch (e) {
-              console.log(`Error fetching collection with id: ${id}`, e);
-              return undefined;
-            }
+          collectionIds.map(async (collectionId) => {
+            return fetchCollectionV1WithCandyId(umi, collectionId);
           }),
         );
 
-        const filterResults = results.filter(
-          (col): col is CollectionV1 => col !== undefined,
-        );
+        const filteredResults = filterCollectionV1WithCandyMachineId(results);
 
-        setCollection(filterResults);
-        console.log(`CollectionV1[]を取得`);
+        setCollectionUris(filteredResults);
+        // console.log(`CollectionWithCandyMachineId[]を取得`);
       } catch (e) {
         console.log(`Error fetching collections `, e);
       }
     };
 
-    if (collectionIds.length > 0) {
-      fetchCollections();
-    }
-  }, [candyMachines]);
+    fetchCollections();
+  }, [collectionIds, umi]);
 
-  return collection;
+  return collectionUris;
 };
 
-export const useCollectionImages = (collections: CollectionV1[]): string[] => {
-  const [images, setImages] = useState<string[]>([]);
+export const useImagesWithCandyMachine = (
+  colsWithCandy: CollectionV1WithCandyMachineId[],
+): ImageWithCandyMachineId[] => {
+  const [images, setImages] = useState<ImageWithCandyMachineId[]>([]);
 
   useEffect(() => {
+    if (colsWithCandy.length === 0) return;
+
     const fetchImageUrls = async () => {
-      const results = await Promise.all(
-        collections.map(async (col) => {
-          try {
-            const responce = await fetch(col.uri);
-            // console.log(result);
-            const data = await responce.json();
-            return data.image;
-          } catch (e) {
-            console.log(
-              `Error fetching image uri with collection uri: ${col.uri}`,
-              e,
-            );
-            return undefined;
-          }
-        }),
-      );
+      try {
+        const results = await Promise.all(
+          colsWithCandy.map(async (colWithCandy) => {
+            return fetchMetadataWithCandyMachine(colWithCandy);
+          }),
+        );
 
-      const filterResults = results.filter(
-        (imageUri): imageUri is string => imageUri !== undefined,
-      );
+        const filteredResults = filterImageWithCandyMachineId(results);
 
-      setImages(filterResults);
-      // console.log("Ok! Collection Images");
+        setImages(filteredResults);
+        // console.log("Ok! Collection Images");
+      } catch (e) {
+        console.log(`Error fetching images`, e);
+      }
     };
 
-    if (collections.length > 0) {
-      fetchImageUrls();
-    }
-  }, [collections]);
+    fetchImageUrls();
+  }, [colsWithCandy]);
 
   return images;
 };

@@ -1,9 +1,9 @@
 import type { Metadata, NextPage } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Wallet } from "@/context/Wallet";
-import { AppBar } from "@/components/layouts/AppBar";
-import { BottomBar } from "@/components/layouts/BottomBar";
+import { AppWalletProvider } from "@/context/AppWalletProvider";
+import { UmiProvider } from "@/context/UmiProvider";
+import { AppBar } from "@/components/AppBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,11 +20,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Wallet>
-          <AppBar />
-          {children}
-          {/* <BottomBar /> */}
-        </Wallet>
+        <AppWalletProvider>
+          <UmiProvider>
+            <AppBar />
+            {children}
+          </UmiProvider>
+        </AppWalletProvider>
       </body>
     </html>
   );

@@ -1,35 +1,28 @@
 "use client";
+import { FC } from "react";
 import Masonry from "@mui/lab/Masonry";
-
-import { CollectionV1 } from "@metaplex-foundation/mpl-core";
-import { CandyMachine } from "@metaplex-foundation/mpl-core-candy-machine";
-import { useCandyIds } from "@/hooks/useFireStore";
+import Link from "next/link";
 import {
-  useCandyMachines,
-  useCollections,
-  useCollectionImages,
+  useUrisWithCandyMachine,
+  useImagesWithCandyMachine,
 } from "@/hooks/useCandy";
 import { TiltPaper } from "@/components/TiltPaper";
-import { LinkPaper } from "@/components/LinkPaper";
+import { ViewProps } from "@/types/cutomInterface";
 
-export const HarigamiMasonry = () => {
-  const candyIds: string[] = useCandyIds();
+export const HarigamiMasonry: FC<ViewProps> = ({ umi, collectionIds }) => {
+  const uris = useUrisWithCandyMachine(umi, collectionIds);
 
-  const candyMachines: CandyMachine[] = useCandyMachines(candyIds);
-
-  const collections: CollectionV1[] = useCollections(candyMachines);
-
-  const collectionImages: string[] = useCollectionImages(collections);
+  const imageWithCandyMachine = useImagesWithCandyMachine(uris);
 
   return (
     <>
       <Masonry columns={5} spacing={1}>
-        <LinkPaper content="Mint!" link="/mint" />
-
-        {collectionImages?.map((img, index) => (
-          <>
-            <TiltPaper key={index} imgUrl={img} index={index} />
-          </>
+        {imageWithCandyMachine?.map((item, index) => (
+          <Link key={index} href={`/view/${item.candyMachineId}`}>
+            <>
+              <TiltPaper key={index} imgUrl={item.coverImage} index={index} />
+            </>
+          </Link>
         ))}
       </Masonry>
     </>

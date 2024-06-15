@@ -16,7 +16,7 @@ interface WalletProps {
   children: React.ReactNode;
 }
 
-export const Wallet: FC<WalletProps> = ({ children }) => {
+export const AppWalletProvider: FC<WalletProps> = ({ children }) => {
   const network = WalletAdapterNetwork.Devnet;
 
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
