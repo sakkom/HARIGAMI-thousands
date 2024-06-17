@@ -9,7 +9,6 @@ import { HarigamiMasonry } from "@/pages/HarigamiMasonry";
 export default function Page() {
   const umi = useContext(UmiContext);
   const candyIds: string[] = useCandyIds();
-
   const collectionIds: CollectionIdWithCandyMachineId[] = useCollectionIds(
     umi,
     candyIds,

@@ -1,4 +1,5 @@
 // import { mockStorage } from "@metaplex-foundation/umi-storage-mock";
+import * as web3 from "@solana/web3.js";
 import {
   generateSigner,
   KeypairSigner,
@@ -8,6 +9,7 @@ import {
   TransactionBuilderSendAndConfirmOptions,
   publicKey,
   transactionBuilder,
+  PublicKey,
 } from "@metaplex-foundation/umi";
 import { mplCore, createCollectionV1 } from "@metaplex-foundation/mpl-core";
 import {
@@ -27,6 +29,7 @@ const options: TransactionBuilderSendAndConfirmOptions = {
 export const createCoreCollection = async (
   umiIdentity: Umi,
   uri: string,
+  title: string,
 ): Promise<KeypairSigner> => {
   umiIdentity.use(mplCore());
 
@@ -35,7 +38,7 @@ export const createCoreCollection = async (
   // const name = metaData.name;
   const { signature } = await createCollectionV1(umiIdentity, {
     collection: collectionSigner,
-    name: "Collectionnnnn", //nameをuri.nameと同一にする　これがCandy Machineの名前となるから。
+    name: title, //nameをuri.nameと同一にする　これがCandy Machineの名前となるから。
     uri: uri,
   }).sendAndConfirm(umiIdentity);
 
@@ -49,6 +52,7 @@ export const createCandyMachine = async (
   collectionSigner: KeypairSigner,
   uri: string,
   quantity: number,
+  vault: any,
 ): Promise<KeypairSigner> => {
   umiIdentity.use(mplCoreCandyMachine());
   // if (!collectionSigner) throw Error("collection is null");
@@ -72,6 +76,10 @@ export const createCandyMachine = async (
     }),
     guards: {
       botTax: some({ lamports: sol(0.001), lastInstruction: true }),
+      solPayment: some({
+        lamports: sol(0.03),
+        destination: vault,
+      }),
     },
   });
 
@@ -87,19 +95,13 @@ export const createCandyMachine = async (
 
 export const mintFromCandyGuard = async (
   umiIdentity: Umi,
-  // candyMachine: KeypairSigner,
-  // corecollection: KeypairSigner,
+  candyMachineId: PublicKey,
+  collectionId: PublicKey,
+  vault: web3.PublicKey,
 ): Promise<any> => {
   umiIdentity.use(mplCoreCandyMachine());
 
   const assetSigner = generateSigner(umiIdentity);
-
-  const coreCollectionId = publicKey(
-    "B7Ls7NhPBtr5GQURNqvmpmh1v2GWdag3HdpYwdPdXRi7",
-  );
-  const candyMachineId = publicKey(
-    "2oVm33x4ugkhUD5SFP9ByJvU7MUxqeEEBfo8Ty1cGiqL",
-  );
 
   const { signature } = await transactionBuilder()
     .add(setComputeUnitLimit(umiIdentity, { units: 800_000 }))
@@ -107,7 +109,10 @@ export const mintFromCandyGuard = async (
       mintV1(umiIdentity, {
         candyMachine: candyMachineId,
         asset: assetSigner,
-        collection: coreCollectionId,
+        collection: collectionId,
+        mintArgs: {
+          solPayment: some({ destination: publicKey(vault) }),
+        },
       }),
     )
     .sendAndConfirm(umiIdentity, options);

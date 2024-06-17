@@ -42,3 +42,5 @@ next-env.d.ts
 /app/test
 
 /firebase.config.js
+
+/action/HarigamiSquad.ts

@@ -1,4 +1,5 @@
-import { Umi } from "@metaplex-foundation/umi";
+import * as web3 from "@solana/web3.js";
+import { Umi, PublicKey } from "@metaplex-foundation/umi";
 import { CollectionIdWithCandyMachineId } from "./customTypes";
 
 interface Attributes {
@@ -30,4 +31,11 @@ export interface MetaData {
 export interface ViewProps {
   umi: Umi;
   collectionIds: CollectionIdWithCandyMachineId[];
+}
+
+export interface MintProps {
+  umi: Umi;
+  candyId: PublicKey;
+  collectionId: PublicKey;
+  squadId: web3.PublicKey | undefined;
 }

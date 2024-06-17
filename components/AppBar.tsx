@@ -4,15 +4,33 @@ import { FC } from "react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import HomeIcon from "@mui/icons-material/Home";
 import PersonIcon from "@mui/icons-material/Person";
+import useScrollTrigger from "@mui/material/useScrollTrigger";
+import Slide from "@mui/material/Slide";
+
+function HideOnScroll(props: any) {
+  const { children, window } = props;
+
+  const trigger = useScrollTrigger({
+    target: window ? window() : undefined,
+  });
+
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  );
+}
 
 export const AppBar: FC = () => {
   return (
-    <div className="app-bar">
-      <div className="flex items-end">
-        <HomeIcon fontSize="large" />
-        <PersonIcon fontSize="large" />
+    <HideOnScroll>
+      <div className="app-bar">
+        <div className="flex items-end">
+          <HomeIcon fontSize="large" />
+          <PersonIcon fontSize="large" />
+        </div>
+        <WalletMultiButton style={{}} />
       </div>
-      <WalletMultiButton style={{}} />
-    </div>
+    </HideOnScroll>
   );
 };

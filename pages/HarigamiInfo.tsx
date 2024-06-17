@@ -43,9 +43,11 @@ export const HarigamiInfo: FC<HarigamiInfoProps> = ({ detail }) => {
         itemsLoaded={itemsLoaded}
         itemsRedeemed_num={itemsRedeemed_num}
       />
-      <img src={imageUrl} />
+      <div className=" w-full aspect-square overflow-hidden flex justify-center ">
+        <img src={imageUrl} className="object-contain " />
+      </div>
       {/* On-chain Tilte & Description */}
-      <Paper className="blackGlassPaper ">
+      <Paper className="blackGlassPaper">
         <ScrambleText
           textInput={title}
           variant="h2"

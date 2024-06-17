@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "animejs": "^3.2.2",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18"
@@ -34,9 +33,14 @@
     "@solana/wallet-adapter-react-ui": "^0.9.35",
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.91.8",
+    "@sqds/sdk": "^2.0.4",
+    "@types/animejs": "^3.1.12",
+    "@types/bn.js": "^5.1.5",
     "@types/node": "^20",
     "@types/react": "18.2.42",
     "@types/react-dom": "^18",
+    "animejs": "^3.2.2",
+    "bn.js": "^5.2.1",
     "dotenv": "^16.4.5",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",

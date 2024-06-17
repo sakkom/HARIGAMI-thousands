@@ -53,7 +53,7 @@ export const HarigamiForm: React.FC = () => {
   } = useForm<HarigamiInputs>({ resolver: zodResolver(HarigamiInputsSchema) });
 
   const onSubmit: SubmitHandler<HarigamiInputs> = async (data) => {
-    const message = await createHarigamiVersion(umiIdentity, data);
+    const message = await createHarigamiVersion(umiIdentity, data, wallet);
     console.log(message);
   };
 
