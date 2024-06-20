@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { UseFormRegister, UseFormWatch } from "react-hook-form";
 import Paper from "@mui/material/Paper";
 import { Typography } from "@material-tailwind/react";
 import { useVanillaTilt } from "@/hooks/useVanillaTilt";
-import { useImagePreview } from "@/hooks/useImagePreview";
 
 interface PreviewPaperProps {
   register: UseFormRegister<any>;
@@ -16,8 +15,22 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   watch,
   errors,
 }) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const imageRef = watch("coverImage"); //note!
   const paperRef = useVanillaTilt();
-  const imageUrl = useImagePreview(watch);
+
+  useEffect(() => {
+    if (imageRef && imageRef.length > 0) {
+      const fileURL = URL.createObjectURL(imageRef[0]);
+      setImageUrl(fileURL);
+
+      return () => {
+        URL.revokeObjectURL(fileURL);
+      };
+    } else {
+      setImageUrl(null);
+    }
+  }, [imageRef]);
 
   return (
     <Paper ref={paperRef} className={`bg-white bg-opacity-10 aspect-square`}>

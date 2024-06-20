@@ -1,4 +1,5 @@
 import { PublicKey } from "@metaplex-foundation/umi";
+import * as web3 from "@solana/web3.js";
 
 export type CollectionIdWithCandyMachineId = {
   collectionMint: PublicKey;
@@ -31,4 +32,23 @@ export type HarigamiDetail = {
   itemsRedeemed_num: number;
   coverImage: string;
   title: string;
+};
+
+export type TransactionDetail = {
+  approved: web3.PublicKey[];
+  authorityBump: number;
+  authorityIndex: number;
+  bump: number;
+  cancelled: web3.PublicKey[];
+  creator: web3.PublicKey;
+  executedIndex: number;
+  instructionIndex: number;
+  ms: web3.PublicKey;
+  publicKey: web3.PublicKey;
+  rejected: web3.PublicKey[];
+  status: {
+    active?: any;
+    executeReady?: any; // Specify the type more accurately if possible
+  };
+  transactionIndex: number;
 };

@@ -1,7 +1,7 @@
 "use client";
 import { useContext } from "react";
 import { UmiContext } from "@/context/UmiProvider";
-import { useCandyIds } from "@/hooks/useFireStore";
+import { useCandyIds } from "@/hooks/useStored";
 import { CollectionIdWithCandyMachineId } from "@/types/customTypes";
 import { useCollectionIds } from "@/hooks/useCandy";
 import { HarigamiMasonry } from "@/pages/HarigamiMasonry";
@@ -14,9 +14,5 @@ export default function Page() {
     candyIds,
   );
 
-  return (
-    <div>
-      <HarigamiMasonry umi={umi} collectionIds={collectionIds} />
-    </div>
-  );
+  return <HarigamiMasonry umi={umi} collectionIds={collectionIds} />;
 }

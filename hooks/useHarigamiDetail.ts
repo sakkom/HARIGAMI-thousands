@@ -10,9 +10,6 @@ export const useHarigamiDetail = (umi: Umi, candyId: PublicKey) => {
   const [harigamiDetail, setHarigamiDetail] = useState<HarigamiDetail>();
 
   useEffect(() => {
-    console.log("Effect fired due to candyId:", candyId);
-    console.log("Effect fired due to umi:", umi);
-
     if (!candyId) return;
 
     const fetchDetail = async (): Promise<HarigamiDetail | undefined> => {

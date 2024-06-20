@@ -1,43 +1,11 @@
-import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import Squads, {
   DEFAULT_MULTISIG_PROGRAM_ID,
-  Wallet,
   getAuthorityPDA,
 } from "@sqds/sdk";
 import BN from "bn.js";
 import * as web3 from "@solana/web3.js";
-
-export const createHarigamiSquad = async (
-  wallet: any,
-  createKey: any,
-  initialMembers: any[],
-  name: string,
-) => {
-  const squads = Squads.devnet(wallet, { commitmentOrConfig: "confirmed" });
-
-  const threshold = 1;
-
-  const multisigAccount = await squads.createMultisig(
-    threshold,
-    createKey,
-    initialMembers,
-    name,
-  );
-
-  const [vault] = getAuthorityPDA(
-    multisigAccount.publicKey,
-    new BN(1),
-    DEFAULT_MULTISIG_PROGRAM_ID,
-  );
-
-  const multisigId = multisigAccount.publicKey.toBase58();
-
-  console.log("Create Squad :", multisigId);
-  console.log("Create Squad Vault:", vault.toBase58());
-
-  return { multisigId, vault };
-};
+import { TransactionDetail } from "@/types/customTypes";
 
 export const getVault = (squadId: PublicKey | undefined) => {
   if (!squadId) return null;
@@ -50,6 +18,29 @@ export const getVault = (squadId: PublicKey | undefined) => {
 
   return vault;
 };
+
+export const fetchProposalsDetail = async (
+  wallet: any,
+  transactionPda: web3.PublicKey[],
+) => {
+  try {
+    const squads = Squads.devnet(wallet, { commitmentOrConfig: "confirmed" });
+
+    const transactions = await squads.getTransactions(transactionPda);
+    // console.log(transactions);
+    return transactions;
+  } catch (e) {
+    console.error("not fetch proposals detail", e);
+  }
+};
+
+export function filterActiveOrReadyTransactions(
+  transactions: TransactionDetail[],
+) {
+  return transactions.filter(
+    (item) => item.status?.active || item.status?.executeReady,
+  );
+}
 
 // export const addMemberToSquad = async (squadId, member) => {
 //   const wallet: any = useWallet();

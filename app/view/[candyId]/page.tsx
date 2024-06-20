@@ -7,9 +7,9 @@ import { UmiContext } from "@/context/UmiProvider";
 import { useHarigamiDetail } from "@/hooks/useHarigamiDetail";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
-import { useSquadId } from "@/hooks/useFireStore";
+import { useSquadId } from "@/hooks/useStored";
 import Link from "next/link";
-import { MintForm } from "@/components/MintForm";
+import { MintForm } from "@/pages/MintForm";
 import SavingsIcon from "@mui/icons-material/Savings";
 import { Rock_Salt } from "next/font/google";
 import { Paper, Typography } from "@mui/material";
@@ -33,19 +33,23 @@ export default function Page({ params }: { params: { candyId: string } }) {
         <div className="mobile-like">
           <HarigamiInfo detail={detail} />
           {collectionId && (
-            <div>
+            <div className="flex">
               <MintForm
                 umi={umi}
                 candyId={candyId}
                 collectionId={collectionId}
                 squadId={squadId}
               />
-              <Link href={`${params.candyId}/${squadId?.toString()}`}>
-                <Paper className="aspect-video blackGlassPaper flex justify-center items-center">
-                  <SavingsIcon fontSize={"large"} />
-                  <div className="flex items-end"></div>
-                </Paper>
-              </Link>
+              <div className="w-full">
+                {squadId && (
+                  <Link href={`${params.candyId}/${squadId}`}>
+                    <Paper className=" aspect-video blackGlassPaper flex justify-center items-center">
+                      <SavingsIcon fontSize={"large"} />
+                      <div className="flex items-end">aaaa</div>
+                    </Paper>
+                  </Link>
+                )}
+              </div>
             </div>
           )}
         </div>

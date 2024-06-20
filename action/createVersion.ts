@@ -1,19 +1,22 @@
+import "dotenv/config";
+import * as web3 from "@solana/web3.js";
 import { Umi } from "@metaplex-foundation/umi";
-import { HarigamiInputs } from "@/components/HarigamiForm";
+import { HarigamiInputs } from "@/pages/HarigamiForm";
 import {
   createCoreCollection,
   createCandyMachine,
 } from "@/utils/candy-machine/createAccount";
-import { getMetadataUri } from "@/utils/formatUtils";
+import { getMetadataUri } from "@/utils/commoUtils";
 import { addItems } from "@/utils/candy-machine/updateAccount";
-import { storeVersionId } from "@/utils/firestoreUtils";
-import { createHarigamiSquad } from "@/utils/squads";
+import { storeVersionIds } from "@/utils/storeUtils";
+// import { createHarigamiSquad } from "@/utils/squads";
 import { PublicKey } from "@solana/web3.js";
+import { postMultisig } from "@/utils/apiUtils";
 
 export const createHarigamiVersion = async (
   umiIdentity: Umi,
   data: HarigamiInputs,
-  wallet: any,
+  creator: web3.PublicKey,
 ): Promise<string> => {
   const coverImage: File = data.coverImage[0];
   const title = data.title;
@@ -33,22 +36,19 @@ export const createHarigamiVersion = async (
     title,
   );
 
-  const createKey = new PublicKey(collectionSigner.publicKey);
-
-  const { multisigId, vault } = await createHarigamiSquad(
-    wallet,
-    createKey,
-    [wallet.publicKey],
-    title,
+  const nodeManager = new web3.PublicKey(
+    "HC7xyZvuwMyA6CduUMbAWXmvp4vTmNLUGoPi5xVc3t7P",
   );
-  console.log("ok multisig");
+  const initialMembers = [nodeManager, creator];
+
+  const { msPda, vaultPda } = await postMultisig(1, initialMembers);
 
   const candyMachineSigner = await createCandyMachine(
     umiIdentity,
     collectionSigner,
     metaDataUri,
     quantity,
-    vault,
+    vaultPda,
   );
 
   const message = await addItems(umiIdentity, candyMachineSigner, quantity);
@@ -62,7 +62,11 @@ export const createHarigamiVersion = async (
     `,
   );
 
-  await storeVersionId(candyMachineSigner.publicKey, multisigId);
+  await storeVersionIds(
+    candyMachineSigner.publicKey,
+    collectionSigner.publicKey,
+    msPda,
+  );
 
   return `Ok! set up harigami version`;
 };

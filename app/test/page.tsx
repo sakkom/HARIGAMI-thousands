@@ -1,37 +1,24 @@
 "use client";
 
-import {
-  addMemberSquad,
-  createHarigamiSquad,
-  getMultisigDetail,
-  getMsTransaction,
-  activeTransaction,
-  approveTransaction,
-  executeTx,
-  transferMember,
-  getVault,
-} from "@/action/HarigamiSquad";
-import { Button } from "@material-tailwind/react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { postMultisig } from "@/utils/apiUtils";
+import * as web3 from "@solana/web3.js";
+import { Button } from "@mui/material";
 
 export default function Page() {
-  const wallet = useWallet();
+  const handlePost = async () => {
+    console.log("foo");
+    const nodeManager = new web3.PublicKey(
+      "HC7xyZvuwMyA6CduUMbAWXmvp4vTmNLUGoPi5xVc3t7P",
+    );
+    const creator = new web3.PublicKey(
+      "9eaVFdsmdZcUArXfwR5AT6VSrRwE77TzGGpLe6XxMXR2",
+    );
+    const initialMembers = [nodeManager, creator];
 
-  const handleSquad = async () => {
-    if (wallet.connected) {
-      // await createHarigamiSquad(wallet);
-      // await getMultisigDetail(wallet);
-      // await addMemberSquad(wallet);
-      // await getMsTransaction(wallet);
-      // await activeTransaction(wallet);
-      // await approveTransaction(wallet);
-      // await executeTx(wallet);
-      // await transferMember(wallet);
-      getVault(wallet);
-    } else {
-      console.log("wallet null");
-    }
+    console.log("hello");
+    const res = await postMultisig(1, initialMembers);
+    console.log(res);
   };
 
-  return <Button onClick={handleSquad}>Create Multisig Wallet</Button>;
+  return <Button onClick={handlePost}>PostMultisig</Button>;
 }

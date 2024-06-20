@@ -15,7 +15,7 @@ import {
   filterCollectionIdWithCandyMachineId,
   filterCollectionV1WithCandyMachineId,
   filterImageWithCandyMachineId,
-} from "@/utils/filter";
+} from "@/utils/commoUtils";
 
 //Mainly /view
 export const useCollectionIds = (
@@ -25,6 +25,8 @@ export const useCollectionIds = (
   const [collectionIds, setCollectionIds] = useState<
     CollectionIdWithCandyMachineId[]
   >([]);
+
+  console.log(storeIds);
 
   useEffect(() => {
     if (storeIds.length === 0) return;

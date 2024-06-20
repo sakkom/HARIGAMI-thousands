@@ -13,7 +13,7 @@ import { PreviewPaper } from "@/components/PreviewPaper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { createHarigamiVersion } from "@/action/HarigamiVersion";
+import { createHarigamiVersion } from "@/action/createVersion";
 import { UmiContext } from "@/context/UmiProvider";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
 
@@ -41,6 +41,8 @@ export type HarigamiInputs = z.infer<typeof HarigamiInputsSchema>;
 export const HarigamiForm: React.FC = () => {
   const umi = useContext(UmiContext);
   const wallet = useWallet();
+  const creator = wallet.publicKey;
+  // if (!creator) throw new Error("not found creator pubKey");
 
   const umiIdentity = umi.use(walletAdapterIdentity(wallet));
 
@@ -53,8 +55,10 @@ export const HarigamiForm: React.FC = () => {
   } = useForm<HarigamiInputs>({ resolver: zodResolver(HarigamiInputsSchema) });
 
   const onSubmit: SubmitHandler<HarigamiInputs> = async (data) => {
-    const message = await createHarigamiVersion(umiIdentity, data, wallet);
-    console.log(message);
+    if (creator) {
+      const message = await createHarigamiVersion(umiIdentity, data, creator);
+      console.log(message);
+    }
   };
 
   return (
