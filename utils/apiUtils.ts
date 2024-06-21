@@ -1,11 +1,7 @@
 import * as web3 from "@solana/web3.js";
 
-export async function postMultisig(
-  threshold: number,
-  initialMembers: web3.PublicKey[],
-) {
+export async function postMultisig(initialMembers: web3.PublicKey[]) {
   const data = {
-    threshold: threshold,
     initialMembers: initialMembers,
   };
 
@@ -25,4 +21,48 @@ export async function postMultisig(
   }
 
   return response.json();
+}
+
+export async function postAddMember(
+  multisigPda: web3.PublicKey,
+  member: web3.PublicKey,
+) {
+  const res = await fetch("http://localhost:3000/api/post/addMember", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      multisigPda,
+      member,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error("res was not ok");
+  }
+
+  return res.text();
+}
+
+export async function postActiveSettle(
+  msPda: web3.PublicKey,
+  recipient: string,
+) {
+  const res = await fetch("http://localhost:3000/api/post/transfer", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      msPda,
+      recipient,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error("res was not ok");
+  }
+
+  return res;
 }

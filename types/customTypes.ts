@@ -34,7 +34,7 @@ export type HarigamiDetail = {
   title: string;
 };
 
-export type TransactionDetail = {
+export type MultisigAccount = {
   approved: web3.PublicKey[];
   authorityBump: number;
   authorityIndex: number;
@@ -48,7 +48,7 @@ export type TransactionDetail = {
   rejected: web3.PublicKey[];
   status: {
     active?: any;
-    executeReady?: any; // Specify the type more accurately if possible
+    executeReady?: any;
   };
   transactionIndex: number;
 };

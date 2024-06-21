@@ -19,7 +19,7 @@ export const useCandyIds = (): string[] => {
     const fetchData = async () => {
       let data: string[] = [];
       try {
-        const querySnapshot = await getDocs(collection(db, "Version2"));
+        const querySnapshot = await getDocs(collection(db, "Version3"));
 
         querySnapshot.forEach((doc) => {
           const candyMachineId = doc.data().machine.candyMachineId;
@@ -46,7 +46,7 @@ export const useSquadId = (candyId: PublicKey) => {
   const candyId_str = candyId.toString();
   useEffect(() => {
     const fetchSquadId = async () => {
-      const versionRef = collection(db, "Version2");
+      const versionRef = collection(db, "Version3");
 
       const q = query(
         versionRef,
@@ -76,17 +76,14 @@ export const useSquadId = (candyId: PublicKey) => {
   return multisigPda;
 };
 
-export const useTxPdas = (squadId: web3.PublicKey) => {
-  const [txPdas, setTxPdas] = useState<web3.PublicKey[]>([]);
+export const useTxPdas = (msPda: string) => {
+  const [txPdas, setTxPdas] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchProposal = async () => {
-      const collectionRef = collection(db, "Version2");
+      const collectionRef = collection(db, "Version3");
 
-      const q = query(
-        collectionRef,
-        where("dao.squadId", "==", squadId.toString()),
-      );
+      const q = query(collectionRef, where("dao.multisigId", "==", msPda));
 
       const querySnapshot = await getDocs(q);
 
@@ -96,11 +93,38 @@ export const useTxPdas = (squadId: web3.PublicKey) => {
         const docSnapShot = querySnapshot.docs[0];
 
         if (docSnapShot && docSnapShot.data()) {
-          const txPdas = docSnapShot.data().dao.proposals;
-          const txPdas_pubKey = txPdas.map(
-            (proposal: string) => new web3.PublicKey(proposal),
-          );
-          setTxPdas(txPdas_pubKey);
+          const txPdas = docSnapShot.data().dao.txPdas;
+          setTxPdas(txPdas);
+        } else {
+          console.log("don't get docSnapshot");
+        }
+      }
+    };
+    fetchProposal();
+  }, []);
+
+  return txPdas;
+};
+
+export const useSettleTxPda = (msPda: string) => {
+  const [txPdas, setTxPda] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchProposal = async () => {
+      const collectionRef = collection(db, "Version3");
+
+      const q = query(collectionRef, where("dao.multisigId", "==", msPda));
+
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        return null;
+      } else {
+        const docSnapShot = querySnapshot.docs[0];
+
+        if (docSnapShot && docSnapShot.data()) {
+          const txPda = docSnapShot.data().settileTxPda;
+          setTxPda(txPda);
         } else {
           console.log("don't get docSnapshot");
         }

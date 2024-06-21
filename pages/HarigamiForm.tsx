@@ -16,6 +16,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { createHarigamiVersion } from "@/action/createVersion";
 import { UmiContext } from "@/context/UmiProvider";
 import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
+import { useRouter } from "next/navigation";
 
 const HarigamiInputsSchema = z.object({
   coverImage: z.any().refine(
@@ -39,6 +40,7 @@ const HarigamiInputsSchema = z.object({
 export type HarigamiInputs = z.infer<typeof HarigamiInputsSchema>;
 
 export const HarigamiForm: React.FC = () => {
+  const router = useRouter();
   const umi = useContext(UmiContext);
   const wallet = useWallet();
   const creator = wallet.publicKey;
@@ -56,8 +58,8 @@ export const HarigamiForm: React.FC = () => {
 
   const onSubmit: SubmitHandler<HarigamiInputs> = async (data) => {
     if (creator) {
-      const message = await createHarigamiVersion(umiIdentity, data, creator);
-      console.log(message);
+      await createHarigamiVersion(umiIdentity, data, creator);
+      router.push("/view");
     }
   };
 

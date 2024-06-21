@@ -2,16 +2,17 @@ import { PublicKey } from "@solana/web3.js";
 import Squads, {
   DEFAULT_MULTISIG_PROGRAM_ID,
   getAuthorityPDA,
+  TransactionAccount,
 } from "@sqds/sdk";
 import BN from "bn.js";
 import * as web3 from "@solana/web3.js";
-import { TransactionDetail } from "@/types/customTypes";
 
-export const getVault = (squadId: PublicKey | undefined) => {
-  if (!squadId) return null;
+export const getVault = (multisigPda: web3.PublicKey) => {
+  if (!multisigPda) return null;
+  // console.log(multisigPda);
 
   const [vault] = getAuthorityPDA(
-    squadId,
+    multisigPda,
     new BN(1),
     DEFAULT_MULTISIG_PROGRAM_ID,
   );
@@ -34,12 +35,12 @@ export const fetchProposalsDetail = async (
   }
 };
 
-export function filterActiveOrReadyTransactions(
-  transactions: TransactionDetail[],
-) {
-  return transactions.filter(
-    (item) => item.status?.active || item.status?.executeReady,
-  );
+export function filterActiveTx(transactions: TransactionAccount[]) {
+  return transactions.filter((item) => item.status?.active);
+}
+
+export function filterExecuteReadyTx(transactions: TransactionAccount[]) {
+  return transactions.filter((item) => item.status?.executeReady);
 }
 
 // export const addMemberToSquad = async (squadId, member) => {

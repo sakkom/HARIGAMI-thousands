@@ -17,7 +17,7 @@ export const createHarigamiVersion = async (
   umiIdentity: Umi,
   data: HarigamiInputs,
   creator: web3.PublicKey,
-): Promise<string> => {
+): Promise<void> => {
   const coverImage: File = data.coverImage[0];
   const title = data.title;
   const genre = data.genre;
@@ -41,7 +41,7 @@ export const createHarigamiVersion = async (
   );
   const initialMembers = [nodeManager, creator];
 
-  const { msPda, vaultPda } = await postMultisig(1, initialMembers);
+  const { msPda, vaultPda } = await postMultisig(initialMembers);
 
   const candyMachineSigner = await createCandyMachine(
     umiIdentity,
@@ -63,10 +63,9 @@ export const createHarigamiVersion = async (
   );
 
   await storeVersionIds(
+    creator,
     candyMachineSigner.publicKey,
     collectionSigner.publicKey,
     msPda,
   );
-
-  return `Ok! set up harigami version`;
 };

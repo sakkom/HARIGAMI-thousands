@@ -25,7 +25,7 @@ export default function Page({ params }: { params: { candyId: string } }) {
   const detail = useHarigamiDetail(umi, candyId);
   const collectionId = detail?.collectionMint;
 
-  const squadId = useSquadId(candyId);
+  const multisigPda = useSquadId(candyId);
 
   return (
     <>
@@ -38,11 +38,11 @@ export default function Page({ params }: { params: { candyId: string } }) {
                 umi={umi}
                 candyId={candyId}
                 collectionId={collectionId}
-                squadId={squadId}
+                multisigPda={multisigPda}
               />
               <div className="w-full">
-                {squadId && (
-                  <Link href={`${params.candyId}/${squadId}`}>
+                {multisigPda && (
+                  <Link href={`${params.candyId}/${multisigPda}`}>
                     <Paper className=" aspect-video blackGlassPaper flex justify-center items-center">
                       <SavingsIcon fontSize={"large"} />
                       <div className="flex items-end">aaaa</div>

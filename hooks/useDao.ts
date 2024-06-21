@@ -1,91 +1,109 @@
 import { useContext, useEffect, useState } from "react";
-import { getVault } from "@/utils/squads";
+// import { getVault } from "@/utils/squads";
 import * as web3 from "@solana/web3.js";
-import Squads, {
+import {
   DEFAULT_MULTISIG_PROGRAM_ID,
   getAuthorityPDA,
   MultisigAccount,
-  Wallet,
+  TransactionAccount,
 } from "@sqds/sdk";
 import BN from "bn.js";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { fetchProposalsDetail } from "@/utils/squads";
 
-export const useVaultBalance = (squadId: PublicKey) => {
-  const [balance, setBalance] = useState<any>(0);
-  const [publicKey, setPublicKey] = useState<web3.PublicKey>();
+export const useVaultBalance = (multisigPda: PublicKey) => {
+  const [balanceSol, setBalanceSol] = useState<any>(0);
+  const [balanceUsd, setBalanceUsd] = useState<any>(0);
+  const [vaultPda, setVaultPda] = useState<web3.PublicKey>();
 
   useEffect(() => {
-    if (!squadId) {
+    if (!multisigPda) {
       console.log("Squad ID is undefined");
       return;
     }
 
-    const vault = getVault(squadId);
-    if (!vault) {
-      console.log("Not found vault");
-      return;
-    }
-    setPublicKey(vault);
-
-    const connection = new web3.Connection(
-      web3.clusterApiUrl("devnet"),
-      "confirmed",
-    );
-
     const fetchBalance = async () => {
+      const connection = new web3.Connection(
+        web3.clusterApiUrl("devnet"),
+        "confirmed",
+      );
+
+      if (!multisigPda) return null;
+
+      const [vault] = getAuthorityPDA(
+        multisigPda,
+        new BN(1),
+        DEFAULT_MULTISIG_PROGRAM_ID,
+      );
+      setVaultPda(vault);
+
       const accountBalance = await connection.getBalance(vault);
-      setBalance(accountBalance / web3.LAMPORTS_PER_SOL);
+      setBalanceSol(accountBalance / web3.LAMPORTS_PER_SOL);
+      setBalanceUsd((accountBalance / web3.LAMPORTS_PER_SOL) * 150);
     };
 
     fetchBalance();
-  }, [squadId]);
+  }, [multisigPda]);
 
-  return { publicKey, balance };
+  return { vaultPda, balanceSol, balanceUsd };
 };
 
-export const useSquadAccount = (squadId: string) => {
-  const wallet: any = useWallet();
-  const [squadAccount, setSquadAccount] = useState<MultisigAccount>();
+export const useMultisigAccount = (multisigPda: string) => {
+  const [msPda, setMsPda] = useState<web3.PublicKey>();
+  const [threshold, setThreshold] = useState<string>();
+  const [members, setMembers] = useState<web3.PublicKey[]>([]);
 
   useEffect(() => {
-    const fetchSquadAccount = async () => {
-      const squads = Squads.devnet(wallet, { commitmentOrConfig: "confirmed" });
+    const fetchMsAccount = async () => {
+      const res = await fetch(`http://localhost:3000/api/get/${multisigPda}`, {
+        method: "GET",
+      });
 
-      const multisigPublicKey = new PublicKey(squadId);
-      const multisigAccount = await squads.getMultisig(multisigPublicKey);
-      setSquadAccount(multisigAccount);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch`);
+      }
+
+      let data = await res.json();
+      setMsPda(new web3.PublicKey(data.publicKey));
+      setThreshold(data.threshold);
+      setMembers(data.keys.map((item: string) => new web3.PublicKey(item)));
     };
 
-    fetchSquadAccount();
-  }, [squadId]);
-
-  return squadAccount;
-};
-
-export const useProposalsDetail = (
-  wallet: any,
-  proposals: web3.PublicKey[],
-) => {
-  const [detail, setDetail] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (proposals.length === 0) {
-      console.log("Wallet is not set or no proposals provided");
-      return;
+    if (multisigPda) {
+      fetchMsAccount();
     }
+  }, [multisigPda]);
 
-    console.log("let's go");
+  return { msPda, threshold, members };
+};
 
-    const fetchDetail = async () => {
-      const results: any = await fetchProposalsDetail(wallet, proposals);
-      console.log(results);
-      setDetail(results);
+export const useTxAccounts = (txPdas: string[]) => {
+  const [txAccounts, setTxAccounts] = useState<TransactionAccount[]>([]);
+
+  useEffect(() => {
+    const fetchTxAccounts = async () => {
+      try {
+        const results = await Promise.all(
+          txPdas.map(async (txPda) => {
+            const res = await fetch(
+              `http://localhost:3000/api/get/txAccount/${txPda}`,
+            );
+            // console.log(res.json());
+
+            return res.json() as Promise<TransactionAccount>;
+          }),
+        );
+        console.log(results);
+        setTxAccounts(results);
+      } catch (e) {
+        console.error("Failed to fetch", e);
+      }
     };
 
-    fetchDetail();
-  }, [proposals]);
+    if (txPdas.length > 0) {
+      fetchTxAccounts();
+    }
+  }, [txPdas]);
 
-  return detail;
+  return txAccounts;
 };

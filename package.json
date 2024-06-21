@@ -14,6 +14,7 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@hookform/resolvers": "^3.6.0",
@@ -45,6 +46,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "firebase": "^10.12.2",
+    "fs": "^0.0.1-security",
     "postcss": "^8",
     "react-hook-form": "^7.51.5",
     "swiper": "^11.1.4",

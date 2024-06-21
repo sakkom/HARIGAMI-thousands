@@ -27,14 +27,16 @@ const db = getFirestore(app);
 // };
 
 export const storeVersionIds = async (
+  creator: web3.PublicKey,
   candyMachineId: PublicKey,
   collectionId: PublicKey,
   msPda: web3.PublicKey,
 ) => {
   try {
-    const versionRef = collection(db, "Version2");
+    const versionRef = collection(db, "Version3");
 
     const setData = {
+      creator: creator.toBase58(),
       machine: {
         candyMachineId: candyMachineId,
         collectionId: collectionId,
@@ -43,6 +45,7 @@ export const storeVersionIds = async (
         multisigId: msPda,
         txPdas: [],
       },
+      settileTxPda: "",
     };
 
     const docRef = await addDoc(versionRef, setData);
@@ -53,16 +56,16 @@ export const storeVersionIds = async (
   }
 };
 
-export const storeProposal = async (
-  squadId: web3.PublicKey,
+export const storeTxPda = async (
+  multisigPda: web3.PublicKey,
   txPda: web3.PublicKey,
 ) => {
   try {
-    const collectionRef = collection(db, "Version2");
+    const collectionRef = collection(db, "Version3");
 
     const q = query(
       collectionRef,
-      where("dao.squadId", "==", squadId.toString()),
+      where("dao.multisigId", "==", multisigPda.toString()),
     );
 
     const queryShapshot = await getDocs(q);
@@ -71,14 +74,46 @@ export const storeProposal = async (
       return null;
     } else {
       const docSnapshot = queryShapshot.docs[0];
-      const docRef = doc(db, "Version2", docSnapshot.id);
+      const docRef = doc(db, "Version3", docSnapshot.id);
 
       const addData = {
-        "dao.proposals": arrayUnion(txPda.toString()),
+        "dao.txPdas": arrayUnion(txPda.toString()),
       };
 
       await updateDoc(docRef, addData);
-      console.log("update proposals");
+      console.log("update txPdas");
+    }
+  } catch (err) {
+    console.error("Error FireStore", err);
+  }
+};
+
+export const storeSettleTxPda = async (
+  multisigPda: web3.PublicKey,
+  txPda: web3.PublicKey,
+) => {
+  try {
+    const collectionRef = collection(db, "Version3");
+
+    const q = query(
+      collectionRef,
+      where("dao.multisigId", "==", multisigPda.toString()),
+    );
+
+    const queryShapshot = await getDocs(q);
+
+    if (queryShapshot.empty) {
+      return null;
+    } else {
+      const docSnapshot = queryShapshot.docs[0];
+      const docRef = doc(db, "Version3", docSnapshot.id);
+
+      const addData = {
+        settileTxPda: txPda.toBase58(),
+      };
+
+      await updateDoc(docRef, addData);
+      // console.log("update txPdas");
     }
   } catch (err) {
     console.error("Error FireStore", err);

@@ -5,6 +5,8 @@ import { AppWalletProvider } from "@/context/AppWalletProvider";
 import { UmiProvider } from "@/context/UmiProvider";
 
 import { AppBar } from "@/components/AppBar";
+import { ThemeProvider } from "@mui/material";
+import { theme } from "@/utils/theme";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,14 +22,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <AppWalletProvider>
-          <UmiProvider>
-            <AppBar />
-            {children}
-          </UmiProvider>
-        </AppWalletProvider>
-      </body>
+      <ThemeProvider theme={theme}>
+        <body className={inter.className}>
+          <AppWalletProvider>
+            <UmiProvider>
+              <AppBar />
+              {children}
+            </UmiProvider>
+          </AppWalletProvider>
+        </body>
+      </ThemeProvider>
     </html>
   );
 }

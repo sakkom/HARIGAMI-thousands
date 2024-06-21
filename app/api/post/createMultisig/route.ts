@@ -7,7 +7,6 @@ import { DEFAULT_MULTISIG_PROGRAM_ID, getAuthorityPDA } from "@sqds/sdk";
 import BN from "bn.js";
 
 interface createMultisigProps {
-  threshold: number;
   initialMembers: string[];
 }
 
@@ -16,15 +15,14 @@ export async function POST(request: Request) {
 
   const createKey = Keypair.generate().publicKey;
 
-  const { threshold, initialMembers }: createMultisigProps =
-    await request.json();
+  const { initialMembers }: createMultisigProps = await request.json();
 
   const initialMembers_pubKey = initialMembers.map(
     (member) => new web3.PublicKey(member),
   );
 
   const multisigAccount = await squads.createMultisig(
-    threshold,
+    2,
     createKey,
     initialMembers_pubKey,
   );

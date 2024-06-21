@@ -37,5 +37,5 @@ export interface MintProps {
   umi: Umi;
   candyId: PublicKey;
   collectionId: PublicKey;
-  squadId: web3.PublicKey | undefined;
+  multisigPda: web3.PublicKey | undefined;
 }

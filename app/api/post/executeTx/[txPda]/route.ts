@@ -2,14 +2,13 @@ import "dotenv/config";
 import * as web3 from "@solana/web3.js";
 import { initializeSquadsSDK } from "@/lib/squads";
 
-interface executeProps {
-  txPda: string;
-}
-
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  { params }: { params: { txPda: string } },
+) {
   const squads = initializeSquadsSDK();
 
-  const { txPda }: executeProps = await request.json();
+  const txPda = new web3.PublicKey(params.txPda);
 
   const txPda_pubKey = new web3.PublicKey(txPda);
 

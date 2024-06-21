@@ -16,7 +16,7 @@ export default function Page() {
     const initialMembers = [nodeManager, creator];
 
     console.log("hello");
-    const res = await postMultisig(1, initialMembers);
+    const res = await postMultisig(initialMembers);
     console.log(res);
   };
 
