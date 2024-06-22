@@ -38,8 +38,8 @@ export const MintForm: FC<MintProps> = ({
 
     await mintFromCandyGuard(umi, candyId, collectionId, vault);
 
-    const res = await postAddMember(multisigPda, publicKey);
-    console.log(res);
+    const txState = await postAddMember(multisigPda, publicKey);
+    // console.log(res);
 
     setError("");
   };

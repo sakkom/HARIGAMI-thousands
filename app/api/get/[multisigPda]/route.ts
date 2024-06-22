@@ -12,5 +12,5 @@ export async function GET(
 
   const multisigAccount = await squads.getMultisig(multisigPda);
 
-  return Response.json(multisigAccount);
+  return Response.json({ msState: multisigAccount });
 }

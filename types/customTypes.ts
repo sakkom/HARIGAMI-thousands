@@ -33,22 +33,3 @@ export type HarigamiDetail = {
   coverImage: string;
   title: string;
 };
-
-export type MultisigAccount = {
-  approved: web3.PublicKey[];
-  authorityBump: number;
-  authorityIndex: number;
-  bump: number;
-  cancelled: web3.PublicKey[];
-  creator: web3.PublicKey;
-  executedIndex: number;
-  instructionIndex: number;
-  ms: web3.PublicKey;
-  publicKey: web3.PublicKey;
-  rejected: web3.PublicKey[];
-  status: {
-    active?: any;
-    executeReady?: any;
-  };
-  transactionIndex: number;
-};

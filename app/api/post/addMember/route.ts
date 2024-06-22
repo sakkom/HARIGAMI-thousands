@@ -40,13 +40,11 @@ export async function POST(request: Request) {
 
     // console.log(txState_active);
     // console.log(txState_approve);
-    console.log(txPDA);
+    // console.log(txPDA);
 
     await storeTxPda(multisigPda_pubKey, txPDA);
 
-    return new Response("Success!", {
-      status: 200,
-    });
+    return Response.json({ txState_approve });
   } else {
     return new Response("Error: Member exist already", {
       status: 409,

@@ -12,8 +12,8 @@ import { PublicKey } from "@solana/web3.js";
 import { fetchProposalsDetail } from "@/utils/squads";
 
 export const useVaultBalance = (multisigPda: PublicKey) => {
-  const [balanceSol, setBalanceSol] = useState<any>(0);
-  const [balanceUsd, setBalanceUsd] = useState<any>(0);
+  const [balanceSol, setBalanceSol] = useState<number>(0);
+  const [balanceUsd, setBalanceUsd] = useState<number>(0);
   const [vaultPda, setVaultPda] = useState<web3.PublicKey>();
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const useVaultBalance = (multisigPda: PublicKey) => {
       if (!multisigPda) return null;
 
       const [vault] = getAuthorityPDA(
-        multisigPda,
+        new web3.PublicKey(multisigPda),
         new BN(1),
         DEFAULT_MULTISIG_PROGRAM_ID,
       );
@@ -49,9 +49,7 @@ export const useVaultBalance = (multisigPda: PublicKey) => {
 };
 
 export const useMultisigAccount = (multisigPda: string) => {
-  const [msPda, setMsPda] = useState<web3.PublicKey>();
-  const [threshold, setThreshold] = useState<string>();
-  const [members, setMembers] = useState<web3.PublicKey[]>([]);
+  const [msState, setMsState] = useState<MultisigAccount>();
 
   useEffect(() => {
     const fetchMsAccount = async () => {
@@ -63,10 +61,9 @@ export const useMultisigAccount = (multisigPda: string) => {
         throw new Error(`Failed to fetch`);
       }
 
-      let data = await res.json();
-      setMsPda(new web3.PublicKey(data.publicKey));
-      setThreshold(data.threshold);
-      setMembers(data.keys.map((item: string) => new web3.PublicKey(item)));
+      const data = await res.json();
+      const msState = data.msState as MultisigAccount;
+      setMsState(msState);
     };
 
     if (multisigPda) {
@@ -74,11 +71,11 @@ export const useMultisigAccount = (multisigPda: string) => {
     }
   }, [multisigPda]);
 
-  return { msPda, threshold, members };
+  return msState;
 };
 
 export const useTxAccounts = (txPdas: string[]) => {
-  const [txAccounts, setTxAccounts] = useState<TransactionAccount[]>([]);
+  const [txStates, setTxStates] = useState<TransactionAccount[]>([]);
 
   useEffect(() => {
     const fetchTxAccounts = async () => {
@@ -89,12 +86,14 @@ export const useTxAccounts = (txPdas: string[]) => {
               `http://localhost:3000/api/get/txAccount/${txPda}`,
             );
             // console.log(res.json());
-
-            return res.json() as Promise<TransactionAccount>;
+            const data = await res.json();
+            const txState = data.txState as TransactionAccount;
+            console.log("foofoo", txState);
+            return txState;
           }),
         );
-        console.log(results);
-        setTxAccounts(results);
+        // console.log(results);
+        setTxStates(results);
       } catch (e) {
         console.error("Failed to fetch", e);
       }
@@ -105,5 +104,5 @@ export const useTxAccounts = (txPdas: string[]) => {
     }
   }, [txPdas]);
 
-  return txAccounts;
+  return txStates;
 };

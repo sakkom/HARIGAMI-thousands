@@ -11,8 +11,8 @@ export async function GET(
 
   const squads = initializeSquadsSDK();
 
-  const txAccount = await squads.getTransaction(txPda);
+  const txState = await squads.getTransaction(txPda);
   // console.log("txAccount:", txAccount);
 
-  return Response.json(txAccount);
+  return Response.json({ txState });
 }

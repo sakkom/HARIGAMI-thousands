@@ -1,4 +1,5 @@
 import * as web3 from "@solana/web3.js";
+import { TransactionAccount } from "@sqds/sdk";
 
 export async function postMultisig(initialMembers: web3.PublicKey[]) {
   const data = {
@@ -42,7 +43,9 @@ export async function postAddMember(
     throw new Error("res was not ok");
   }
 
-  return res.text();
+  const txState = res.json() as Promise<TransactionAccount>;
+
+  return txState;
 }
 
 export async function postActiveSettle(
@@ -64,5 +67,9 @@ export async function postActiveSettle(
     throw new Error("res was not ok");
   }
 
-  return res;
+  const data = await res.json();
+
+  const txState = data.firstTxState as TransactionAccount;
+
+  return txState;
 }

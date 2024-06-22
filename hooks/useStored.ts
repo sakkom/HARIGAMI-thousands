@@ -106,8 +106,8 @@ export const useTxPdas = (msPda: string) => {
   return txPdas;
 };
 
-export const useSettleTxPda = (msPda: string) => {
-  const [txPdas, setTxPda] = useState<string[]>([]);
+export const useSettlement = (msPda: string) => {
+  const [settlement, setSettlement] = useState<any>();
 
   useEffect(() => {
     const fetchProposal = async () => {
@@ -123,8 +123,9 @@ export const useSettleTxPda = (msPda: string) => {
         const docSnapShot = querySnapshot.docs[0];
 
         if (docSnapShot && docSnapShot.data()) {
-          const txPda = docSnapShot.data().settileTxPda;
-          setTxPda(txPda);
+          const data = docSnapShot.data().settlement;
+          console.log(data);
+          setSettlement(data);
         } else {
           console.log("don't get docSnapshot");
         }
@@ -133,5 +134,5 @@ export const useSettleTxPda = (msPda: string) => {
     fetchProposal();
   }, []);
 
-  return txPdas;
+  return settlement;
 };

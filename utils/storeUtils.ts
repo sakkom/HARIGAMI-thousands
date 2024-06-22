@@ -45,7 +45,7 @@ export const storeVersionIds = async (
         multisigId: msPda,
         txPdas: [],
       },
-      settileTxPda: "",
+      settlement: {},
     };
 
     const docRef = await addDoc(versionRef, setData);
@@ -91,6 +91,9 @@ export const storeTxPda = async (
 export const storeSettleTxPda = async (
   multisigPda: web3.PublicKey,
   txPda: web3.PublicKey,
+  recipient: web3.PublicKey,
+  amount: number,
+  threshold: number,
 ) => {
   try {
     const collectionRef = collection(db, "Version3");
@@ -109,7 +112,12 @@ export const storeSettleTxPda = async (
       const docRef = doc(db, "Version3", docSnapshot.id);
 
       const addData = {
-        settileTxPda: txPda.toBase58(),
+        settlement: {
+          txPda: txPda.toString(),
+          recipient: recipient.toString(),
+          amount,
+          threshold,
+        },
       };
 
       await updateDoc(docRef, addData);

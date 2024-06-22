@@ -12,7 +12,7 @@ export const getVault = (multisigPda: web3.PublicKey) => {
   // console.log(multisigPda);
 
   const [vault] = getAuthorityPDA(
-    multisigPda,
+    new web3.PublicKey(multisigPda),
     new BN(1),
     DEFAULT_MULTISIG_PROGRAM_ID,
   );
@@ -40,7 +40,20 @@ export function filterActiveTx(transactions: TransactionAccount[]) {
 }
 
 export function filterExecuteReadyTx(transactions: TransactionAccount[]) {
+  // console.log("foo", transactions);
   return transactions.filter((item) => item.status?.executeReady);
+}
+
+export async function approveTxUser(
+  wallet: any,
+  transactionPda: web3.PublicKey,
+) {
+  // console.log(txPda);
+  const squads = Squads.devnet(wallet, { commitmentOrConfig: "confirmed" });
+  const txState = await squads.approveTransaction(transactionPda);
+  // console.log("approve,", txState.approved);
+
+  return txState;
 }
 
 // export const addMemberToSquad = async (squadId, member) => {
