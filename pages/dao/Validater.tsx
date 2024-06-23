@@ -89,7 +89,6 @@ export const Validater: FC<ValidaterProps> = ({ msState }) => {
       {/* transactionある場合のみ表示 */}
 
       <Paper className="blackGlassPaper">
-        <Typography variant="h5">pending</Typography>
         {txStates?.map(
           (txState?) =>
             txState?.status?.active && (

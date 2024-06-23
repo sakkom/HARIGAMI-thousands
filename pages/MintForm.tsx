@@ -3,13 +3,24 @@ import { FC, useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import { Paper } from "@mui/material";
 import { mintFromCandyGuard } from "@/utils/candy-machine/createAccount";
-import { MintProps } from "@/types/cutomInterface";
 import * as web3 from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { postAddMember } from "@/utils/apiUtils";
 import { getVault } from "@/utils/squads";
+import { PublicKey, Umi } from "@metaplex-foundation/umi";
+import { Typography } from "@material-tailwind/react";
+import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
+
+export interface MintProps {
+  isMint: boolean;
+  umi: Umi;
+  candyId: PublicKey;
+  collectionId: PublicKey;
+  multisigPda: web3.PublicKey | undefined;
+}
 
 export const MintForm: FC<MintProps> = ({
+  isMint,
   umi,
   candyId,
   collectionId,
@@ -18,6 +29,7 @@ export const MintForm: FC<MintProps> = ({
   const wallet = useWallet();
   const publicKey = wallet.publicKey;
   const [error, setError] = useState("");
+  umi.use(walletAdapterIdentity(wallet)); //mint
 
   useEffect(() => {
     if (!multisigPda) {
@@ -45,8 +57,16 @@ export const MintForm: FC<MintProps> = ({
   };
 
   return (
-    <Paper className=" animatedBackground w-full aspect-video flex items-center justify-center">
-      <Button onClick={handleSubmit}>Mint</Button>
-    </Paper>
+    <>
+      {isMint ? (
+        <Paper className=" animatedBackground w-full aspect-video flex items-center justify-center">
+          <Button onClick={handleSubmit}>Publish</Button>
+        </Paper>
+      ) : (
+        <Paper className=" blackGlassPaper w-full aspect-video flex items-center justify-center">
+          <Typography variant="h5">thnks</Typography>
+        </Paper>
+      )}
+    </>
   );
 };

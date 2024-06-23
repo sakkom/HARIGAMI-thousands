@@ -8,7 +8,7 @@ import {
 } from "@/utils/candy-machine/createAccount";
 import { getMetadataUri } from "@/utils/commoUtils";
 import { addItems } from "@/utils/candy-machine/updateAccount";
-import { storeVersionIds } from "@/utils/storeUtils";
+import { storeVersionIds, storeHarigamiCollection } from "@/utils/storeUtils";
 // import { createHarigamiSquad } from "@/utils/squads";
 import { PublicKey } from "@solana/web3.js";
 import { postMultisig } from "@/utils/apiUtils";
@@ -17,24 +17,29 @@ export const createHarigamiVersion = async (
   umiIdentity: Umi,
   data: HarigamiInputs,
   creator: web3.PublicKey,
+  updateProgress: (progress: number) => void,
 ): Promise<void> => {
   const coverImage: File = data.coverImage[0];
   const title = data.title;
-  const genre = data.genre;
+  // const genre = data.genre;
   const quantity = data.quantity;
 
   const metaDataUri = await getMetadataUri(
     umiIdentity,
     coverImage,
     title,
-    genre,
+    // genre,
   );
+
+  updateProgress(20);
 
   const collectionSigner = await createCoreCollection(
     umiIdentity,
     metaDataUri,
     title,
   );
+
+  updateProgress(40);
 
   const nodeManager = new web3.PublicKey(
     "HC7xyZvuwMyA6CduUMbAWXmvp4vTmNLUGoPi5xVc3t7P",
@@ -43,15 +48,22 @@ export const createHarigamiVersion = async (
 
   const { msPda, vaultPda } = await postMultisig(initialMembers);
 
+  updateProgress(60);
+
   const candyMachineSigner = await createCandyMachine(
     umiIdentity,
     collectionSigner,
     metaDataUri,
-    quantity,
+    // quantity,
     vaultPda,
+    title,
   );
 
-  const message = await addItems(umiIdentity, candyMachineSigner, quantity);
+  updateProgress(80);
+
+  const message = await addItems(umiIdentity, candyMachineSigner); //test 10
+
+  updateProgress(100);
 
   console.log(
     `
@@ -68,4 +80,5 @@ export const createHarigamiVersion = async (
     collectionSigner.publicKey,
     msPda,
   );
+  await storeHarigamiCollection(creator, collectionSigner.publicKey);
 };

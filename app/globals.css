@@ -74,6 +74,10 @@ body {
     /* Solana light blue */
 }
 
+.instgramBackground {
+    background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf);
+}
+
 .animatedBackground {
     animation: backgroundAnimation 3s linear infinite;
 }

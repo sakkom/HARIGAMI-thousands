@@ -33,7 +33,10 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   }, [imageRef]);
 
   return (
-    <Paper ref={paperRef} className={`bg-white bg-opacity-10 aspect-square`}>
+    <Paper
+      ref={paperRef}
+      className={`bg-white bg-opacity-10 aspect-square flex justify-center p-5`}
+    >
       {imageUrl ? (
         <img src={imageUrl} alt="Uploaded" className="max-w-full max-h-full" />
       ) : (

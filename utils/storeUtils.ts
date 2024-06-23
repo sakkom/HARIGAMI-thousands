@@ -25,6 +25,26 @@ const db = getFirestore(app);
 //     console.error("Error", err);
 //   }
 // };
+//
+export const storeHarigamiCollection = async (
+  creator: web3.PublicKey,
+  collectionId: PublicKey,
+) => {
+  try {
+    const versionRef = collection(db, "harigamiCollection");
+
+    const setData = {
+      harigami: {
+        creator: creator.toBase58(),
+        collectionId: collectionId.toString(),
+      },
+    };
+
+    await addDoc(versionRef, setData);
+  } catch (err) {
+    console.error("Error", err);
+  }
+};
 
 export const storeVersionIds = async (
   creator: web3.PublicKey,

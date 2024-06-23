@@ -6,6 +6,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import PersonIcon from "@mui/icons-material/Person";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Slide from "@mui/material/Slide";
+import Link from "next/link";
 
 function HideOnScroll(props: any) {
   const { children, window } = props;
@@ -26,8 +27,12 @@ export const AppBar: FC = () => {
     <HideOnScroll>
       <div className="app-bar">
         <div className="flex items-end">
-          <HomeIcon fontSize="large" />
-          <PersonIcon fontSize="large" />
+          <Link href={"/collection"}>
+            <HomeIcon fontSize="large" />
+          </Link>
+          <Link href={"/assets"}>
+            <PersonIcon fontSize="large" />
+          </Link>
         </div>
         <WalletMultiButton style={{}} />
       </div>

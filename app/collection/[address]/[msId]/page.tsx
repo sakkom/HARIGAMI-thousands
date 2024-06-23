@@ -11,8 +11,8 @@ import { DaoOverview } from "@/pages/dao/DaoOverview";
 import { Settlement } from "@/pages/dao/Settlement";
 import { Validater } from "@/pages/dao/Validater";
 
-export default function Page({ params }: { params: { multisigId: string } }) {
-  const multisigPda = params.multisigId;
+export default function Page({ params }: { params: { msId: string } }) {
+  const multisigPda = params.msId;
   const { publicKey } = useWallet();
 
   const initialMsState: MultisigAccount | undefined =
@@ -38,7 +38,6 @@ export default function Page({ params }: { params: { multisigId: string } }) {
     <div className="flex flex-col mobile-like">
       {msState && (
         <div>
-          <DaoExplorer msPda={msState.publicKey} />
           <DaoOverview msState={msState} />
           <Validater msState={msState} />
           {publicKey && (
@@ -48,6 +47,7 @@ export default function Page({ params }: { params: { multisigId: string } }) {
               viewer={publicKey}
             />
           )}
+          <DaoExplorer msPda={msState.publicKey} />
         </div>
       )}
     </div>

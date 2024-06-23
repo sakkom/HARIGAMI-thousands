@@ -19,50 +19,29 @@ const options: TransactionBuilderSendAndConfirmOptions = {
 export const addItems = async (
   umiIdentity: Umi,
   candyMachine: KeypairSigner,
-  quantity: number,
+  // quantity: number,
 ): Promise<number | null> => {
   try {
     umiIdentity.use(mplCoreCandyMachine());
 
-    const configLines = Array.from({ length: quantity }, (_, i) => ({
-      name: `${i}`,
-      uri: "",
-    }));
+    await addConfigLines(umiIdentity, {
+      candyMachine: candyMachine.publicKey,
+      index: 0,
+      configLines: [
+        { name: "", uri: "" },
+        { name: "", uri: "" },
+        { name: "validater", uri: "" },
+        { name: "", uri: "" },
+        { name: "", uri: "" },
+        { name: "", uri: "" },
+        { name: "", uri: "" },
+        { name: "", uri: "" },
+        { name: "", uri: "" },
+        { name: "", uri: "" },
+      ],
+    }).sendAndConfirm(umiIdentity, options);
 
-    const batchSize = 10;
-    let totalAdded = 0;
-
-    const builders: TransactionBuilder[] = [];
-
-    for (let i = 0; i < configLines.length; i += batchSize) {
-      const batch = configLines.slice(i, i + batchSize);
-
-      const transactionBuilder = addConfigLines(umiIdentity, {
-        candyMachine: candyMachine.publicKey,
-        index: i,
-        configLines: batch,
-      });
-
-      builders.push(transactionBuilder);
-
-      totalAdded += batch.length;
-    }
-
-    const transactionBuilderGroup = new TransactionBuilderGroup(builders);
-
-    const results = await transactionBuilderGroup.sendAndConfirm(
-      umiIdentity,
-      options,
-    );
-
-    // const sigs = results.map((result) => result.signature);
-    // console.log(
-    //   sigs.map((sig) => {
-    //     return base58.deserialize(sig)[0];
-    //   }),
-    // );
-
-    return totalAdded;
+    return 10;
   } catch (error) {
     console.log("Error adding items to the Candy Machine");
     return null;

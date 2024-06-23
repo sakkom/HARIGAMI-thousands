@@ -1,24 +1,27 @@
 "use client";
 
-import { postMultisig } from "@/utils/apiUtils";
-import * as web3 from "@solana/web3.js";
-import { Button } from "@mui/material";
+import { useContext, useEffect } from "react";
+import { UmiContext } from "@/context/UmiProvider";
+import { mplCore, fetchAssetsByOwner } from "@metaplex-foundation/mpl-core";
+import { publicKey } from "@metaplex-foundation/umi";
 
 export default function Page() {
-  const handlePost = async () => {
-    console.log("foo");
-    const nodeManager = new web3.PublicKey(
-      "HC7xyZvuwMyA6CduUMbAWXmvp4vTmNLUGoPi5xVc3t7P",
-    );
-    const creator = new web3.PublicKey(
-      "9eaVFdsmdZcUArXfwR5AT6VSrRwE77TzGGpLe6XxMXR2",
-    );
-    const initialMembers = [nodeManager, creator];
+  const umi = useContext(UmiContext);
+  umi.use(mplCore());
+  useEffect(() => {
+    const fetchAsset = async () => {
+      const result = await fetchAssetsByOwner(
+        umi,
+        publicKey("9eaVFdsmdZcUArXfwR5AT6VSrRwE77TzGGpLe6XxMXR2"),
+        {
+          skipDerivePlugins: false,
+        },
+      );
+      console.log(result);
+    };
 
-    console.log("hello");
-    const res = await postMultisig(initialMembers);
-    console.log(res);
-  };
+    fetchAsset();
+  }, []);
 
-  return <Button onClick={handlePost}>PostMultisig</Button>;
+  return <h1>foo</h1>;
 }

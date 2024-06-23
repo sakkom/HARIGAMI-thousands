@@ -51,8 +51,9 @@ export const createCandyMachine = async (
   umiIdentity: Umi,
   collectionSigner: KeypairSigner,
   uri: string,
-  quantity: number,
+  // quantity: number,
   vault: any,
+  name: string,
 ): Promise<KeypairSigner> => {
   umiIdentity.use(mplCoreCandyMachine());
   // if (!collectionSigner) throw Error("collection is null");
@@ -64,20 +65,20 @@ export const createCandyMachine = async (
     candyMachine: candyMachineSigner,
     collection: collectionSigner.publicKey,
     collectionUpdateAuthority: umiIdentity.identity,
-    itemsAvailable: quantity,
+    itemsAvailable: 10,
     authority: umiIdentity.identity.publicKey,
     isMutable: true,
     configLineSettings: some({
       prefixName: "貼紙 #",
       nameLength: 20,
       prefixUri: uri,
-      uriLength: 29,
+      uriLength: 30,
       isSequential: false,
     }),
     guards: {
       botTax: some({ lamports: sol(0.001), lastInstruction: true }),
       solPayment: some({
-        lamports: sol(0.03),
+        lamports: sol(0.067),
         destination: vault,
       }),
     },

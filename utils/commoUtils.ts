@@ -1,21 +1,41 @@
 import {
-  CollectionIdWithCandyMachineId,
-  CollectionV1WithCandyMachineId,
-  ImageWithCandyMachineId,
-} from "@/types/customTypes";
-
-import {
   Umi,
   createGenericFileFromBrowserFile,
 } from "@metaplex-foundation/umi";
 import { irysUploader } from "@metaplex-foundation/umi-uploader-irys";
+
+interface Attributes {
+  trait_type?: string;
+  value?: string;
+}
+
+interface Properties {
+  files?: AttachedFile[];
+  category: string;
+}
+
+interface AttachedFile {
+  uri?: string;
+  type?: string;
+  cdn?: boolean;
+}
+
+export interface MetaData {
+  name: string;
+  description: string;
+  image: string;
+  animation_url?: string;
+  external_url?: string;
+  attributes: Attributes[];
+  properties?: Properties;
+}
 
 //MESSAGE: 動的にimageURIをセットするとphantom walletになぜか反映されない。
 export const getMetadataUri = async (
   umiIdentity: Umi,
   coverImage: File,
   title: string,
-  genre?: string,
+  // genre?: string,
 ): Promise<any> => {
   umiIdentity.use(irysUploader());
 
@@ -32,34 +52,10 @@ export const getMetadataUri = async (
     attributes: [
       {
         trait_type: "Genre",
-        value: genre,
+        value: "no genre",
       },
     ],
   });
 
   return uri;
-};
-
-export const filterCollectionIdWithCandyMachineId = (
-  results: (CollectionIdWithCandyMachineId | undefined)[],
-) => {
-  return results.filter(
-    (item): item is CollectionIdWithCandyMachineId => item != undefined,
-  );
-};
-
-export const filterCollectionV1WithCandyMachineId = (
-  results: (CollectionV1WithCandyMachineId | undefined)[],
-) => {
-  return results.filter(
-    (item): item is CollectionV1WithCandyMachineId => item !== undefined,
-  );
-};
-
-export const filterImageWithCandyMachineId = (
-  results: (ImageWithCandyMachineId | undefined)[],
-) => {
-  return results.filter(
-    (image): image is ImageWithCandyMachineId => image !== undefined,
-  );
 };

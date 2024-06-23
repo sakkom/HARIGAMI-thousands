@@ -12,15 +12,16 @@ export const TiltPaper: FC<TiltPaperProps> = ({ imgUrl, index }) => {
   const tiltRef = useVanillaTilt();
 
   return (
-    <Paper ref={tiltRef}>
+    <Paper
+      ref={tiltRef}
+      className="blackGlassPaper flex justify-center p-5 aspect-square"
+    >
       {imgUrl && (
-        <Image
+        <img
           key={index}
           src={imgUrl}
           alt={`Collection Image ${index}`}
-          width={500}
-          height={500}
-          priority={index === 0}
+          className="object-cover"
         />
       )}
     </Paper>
