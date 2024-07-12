@@ -41,6 +41,6 @@ next-env.d.ts
 # testpage
 /app/test
 
-/firebase.config.js
+
 
 /action/HarigamiSquad.ts
