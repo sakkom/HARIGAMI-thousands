@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "latest": "^0.2.0",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18"
@@ -21,11 +22,11 @@
     "@material-tailwind/react": "^2.1.9",
     "@metaplex-foundation/mpl-core": "^1.0.2",
     "@metaplex-foundation/mpl-core-candy-machine": "^0.2.1",
-    "@metaplex-foundation/umi": "^0.9.1",
-    "@metaplex-foundation/umi-bundle-defaults": "^0.9.1",
-    "@metaplex-foundation/umi-signer-wallet-adapters": "^0.9.1",
-    "@metaplex-foundation/umi-storage-mock": "^0.9.1",
-    "@metaplex-foundation/umi-uploader-irys": "^0.9.1",
+    "@metaplex-foundation/umi": "^0.8.2",
+    "@metaplex-foundation/umi-bundle-defaults": "^0.8.2",
+    "@metaplex-foundation/umi-signer-wallet-adapters": "^0.8.2",
+    "@metaplex-foundation/umi-storage-mock": "^0.8.2",
+    "@metaplex-foundation/umi-uploader-irys": "^0.8.2",
     "@mui/icons-material": "^5.15.19",
     "@mui/joy": "^5.0.0-beta.36",
     "@mui/lab": "^5.0.0-alpha.170",
@@ -56,5 +57,10 @@
     "use-scramble": "^2.2.15",
     "vanilla-tilt": "^1.8.1",
     "zod": "^3.23.8"
+  },
+  "overrides": {
+    "@metaplex-foundation/mpl-core-candy-machine": {
+      "@metaplex-foundation/mpl-core": "^1.0.2"
+    }
   }
 }
